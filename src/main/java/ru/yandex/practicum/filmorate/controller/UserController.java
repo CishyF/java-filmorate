@@ -18,16 +18,23 @@ public class UserController {
 
     @GetMapping("/users")
     public List<User> getUsers() {
+        log.info("Пришел GET-запрос /users без тела");
+
         if (users.isEmpty()) {
+            log.info("Ответ на GET-запрос /users с пустым списком пользователей");
             return Collections.emptyList();
         }
 
+        log.info("Ответ на GET-запрос /users с телом={}", users.values());
         return new ArrayList<>(users.values());
     }
 
     @PostMapping("/users")
     public User createUser(@Valid @RequestBody User user) {
+        log.info("Пришел POST-запрос /users с телом={}", user);
+
         if (user.getName() == null) {
+            log.info("Пользователю user={} присвоено имя, соответствующее логину", user);
             user.setName(user.getLogin());
         }
 
@@ -35,21 +42,23 @@ public class UserController {
         user.setId(id);
 
         users.put(id, user);
-        log.info("Пользователь с id={} успешно создан", id);
+        log.info("Пользователь user={} успешно создан", user);
         return user;
     }
 
     @PutMapping ("/users")
     public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
+        log.info("Пришел PUT-запрос /users с телом={}", user);
+
         final int id = user.getId();
 
         if (!users.containsKey(id)) {
-            log.warn("Попытка обновить несуществующего пользователя");
+            log.warn("Попытка обновить несуществующего пользователя user={}", user);
             return new ResponseEntity<>(user, HttpStatus.NOT_FOUND);
         }
 
         users.put(id, user);
-        log.info("Пользователь с id={} успешно обновлен", id);
+        log.info("Пользователь user={} успешно обновлен", user);
         return ResponseEntity.ok(user);
     }
 }

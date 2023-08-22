@@ -18,34 +18,42 @@ public class FilmController {
 
     @GetMapping("/films")
     public List<Film> getFilms() {
+        log.info("Пришел GET-запрос /films без тела");
+
         if (films.isEmpty()) {
+            log.info("Ответ на GET-запрос /films с пустым списком фильмов");
             return Collections.emptyList();
         }
 
+        log.info("Ответ на GET-запрос /films с телом={}", films.values());
         return new ArrayList<>(films.values());
     }
 
     @PostMapping("/films")
     public Film createFilm(@Valid @RequestBody Film film) {
+        log.info("Пришел POST-запрос /films с телом={}", film);
+
         final int id = ++idCounter;
         film.setId(id);
 
         films.put(id, film);
-        log.info("Фильм с id={} успешно создан", id);
+        log.info("Фильм film={} успешно создан", film);
         return film;
     }
 
     @PutMapping("/films")
     public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
+        log.info("Пришел PUT-запрос /films с телом={}", film);
+
         final int id = film.getId();
 
         if (!films.containsKey(id)) {
-            log.warn("Попытка обновить несуществующий фильм");
+            log.warn("Попытка обновить несуществующий фильм film={}", film);
             return new ResponseEntity<>(film, HttpStatus.NOT_FOUND);
         }
 
         films.put(id, film);
-        log.info("Фильм с id={} успешно обновлен", id);
+        log.info("Фильм film={} успешно обновлен", film);
         return ResponseEntity.ok(film);
     }
 }
