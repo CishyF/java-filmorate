@@ -13,16 +13,16 @@ import java.util.*;
 @RestController
 public class UserController {
 
-    private Map<Integer, User> usersById = new HashMap<>();
+    private Map<Integer, User> users = new HashMap<>();
     private int idCounter = 1;
 
     @GetMapping("/users")
     public List<User> getUsers() {
-        if (usersById.isEmpty()) {
+        if (users.isEmpty()) {
             return Collections.emptyList();
         }
 
-        return new ArrayList<>(usersById.values());
+        return new ArrayList<>(users.values());
     }
 
     @PostMapping("/users")
@@ -34,7 +34,7 @@ public class UserController {
         final int id = idCounter++;
         user.setId(id);
 
-        usersById.put(id, user);
+        users.put(id, user);
         log.info("Пользователь с id={} успешно создан", id);
         return user;
     }
@@ -43,12 +43,12 @@ public class UserController {
     public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
         final int id = user.getId();
 
-        if (!usersById.containsKey(id)) {
+        if (!users.containsKey(id)) {
             log.warn("Попытка обновить несуществующего пользователя");
             return new ResponseEntity<>(user, HttpStatus.NOT_FOUND);
         }
 
-        usersById.put(id, user);
+        users.put(id, user);
         log.info("Пользователь с id={} успешно обновлен", id);
         return ResponseEntity.ok(user);
     }

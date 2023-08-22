@@ -13,16 +13,16 @@ import java.util.*;
 @RestController
 public class FilmController {
 
-    private Map<Integer, Film> filmsById = new HashMap<>();
+    private Map<Integer, Film> films = new HashMap<>();
     private int idCounter = 1;
 
     @GetMapping("/films")
     public List<Film> getFilms() {
-        if (filmsById.isEmpty()) {
+        if (films.isEmpty()) {
             return Collections.emptyList();
         }
 
-        return new ArrayList<>(filmsById.values());
+        return new ArrayList<>(films.values());
     }
 
     @PostMapping("/films")
@@ -30,7 +30,7 @@ public class FilmController {
         final int id = idCounter++;
         film.setId(id);
 
-        filmsById.put(id, film);
+        films.put(id, film);
         log.info("Фильм с id={} успешно создан", id);
         return film;
     }
@@ -39,12 +39,12 @@ public class FilmController {
     public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
         final int id = film.getId();
 
-        if (!filmsById.containsKey(id)) {
+        if (!films.containsKey(id)) {
             log.warn("Попытка обновить несуществующий фильм");
             return new ResponseEntity<>(film, HttpStatus.NOT_FOUND);
         }
 
-        filmsById.put(id, film);
+        films.put(id, film);
         log.info("Фильм с id={} успешно обновлен", id);
         return ResponseEntity.ok(film);
     }
