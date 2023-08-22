@@ -27,7 +27,10 @@ public class UserController {
 
     @PostMapping("/users")
     public User createUser(@Valid @RequestBody User user) {
+        log.info("Пришел Post-запрос /users с телом={}", user);
+
         if (user.getName() == null) {
+            log.info("Пользователю user={} присвоено имя, соответствующее логину", user);
             user.setName(user.getLogin());
         }
 
@@ -35,21 +38,23 @@ public class UserController {
         user.setId(id);
 
         users.put(id, user);
-        log.info("Пользователь с id={} успешно создан", id);
+        log.info("Пользователь user={} успешно создан", user);
         return user;
     }
 
     @PutMapping ("/users")
     public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
+        log.info("Пришел Put-запрос /users с телом={}", user);
+
         final int id = user.getId();
 
         if (!users.containsKey(id)) {
-            log.warn("Попытка обновить несуществующего пользователя");
+            log.warn("Попытка обновить несуществующего пользователя user={}", user);
             return new ResponseEntity<>(user, HttpStatus.NOT_FOUND);
         }
 
         users.put(id, user);
-        log.info("Пользователь с id={} успешно обновлен", id);
+        log.info("Пользователь user={} успешно обновлен", user);
         return ResponseEntity.ok(user);
     }
 }

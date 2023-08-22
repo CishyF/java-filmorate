@@ -27,25 +27,29 @@ public class FilmController {
 
     @PostMapping("/films")
     public Film createFilm(@Valid @RequestBody Film film) {
+        log.info("Пришел Post-запрос /films с телом={}", film);
+
         final int id = ++idCounter;
         film.setId(id);
 
         films.put(id, film);
-        log.info("Фильм с id={} успешно создан", id);
+        log.info("Фильм film={} успешно создан", film);
         return film;
     }
 
     @PutMapping("/films")
     public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
+        log.info("Пришел Put-запрос /films с телом={}", film);
+
         final int id = film.getId();
 
         if (!films.containsKey(id)) {
-            log.warn("Попытка обновить несуществующий фильм");
+            log.warn("Попытка обновить несуществующий фильм film={}", film);
             return new ResponseEntity<>(film, HttpStatus.NOT_FOUND);
         }
 
         films.put(id, film);
-        log.info("Фильм с id={} успешно обновлен", id);
+        log.info("Фильм film={} успешно обновлен", film);
         return ResponseEntity.ok(film);
     }
 }
