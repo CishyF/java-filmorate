@@ -14,7 +14,7 @@ import java.util.*;
 public class UserController {
 
     private Map<Integer, User> users = new HashMap<>();
-    private int idCounter = 1;
+    private int idCounter = 0;
 
     @GetMapping("/users")
     public List<User> getUsers() {
@@ -31,7 +31,7 @@ public class UserController {
             user.setName(user.getLogin());
         }
 
-        final int id = idCounter++;
+        final int id = ++idCounter;
         user.setId(id);
 
         users.put(id, user);

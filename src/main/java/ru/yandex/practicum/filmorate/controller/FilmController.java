@@ -14,7 +14,7 @@ import java.util.*;
 public class FilmController {
 
     private Map<Integer, Film> films = new HashMap<>();
-    private int idCounter = 1;
+    private int idCounter = 0;
 
     @GetMapping("/films")
     public List<Film> getFilms() {
@@ -27,7 +27,7 @@ public class FilmController {
 
     @PostMapping("/films")
     public Film createFilm(@Valid @RequestBody Film film) {
-        final int id = idCounter++;
+        final int id = ++idCounter;
         film.setId(id);
 
         films.put(id, film);
