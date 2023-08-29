@@ -63,7 +63,7 @@ public class UserController {
         log.info("Пользователь user={} успешно создан", savedUser);
         return savedUser;
     }
-
+  
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
         log.info("Пришел PUT-запрос /users с телом={}", user);
