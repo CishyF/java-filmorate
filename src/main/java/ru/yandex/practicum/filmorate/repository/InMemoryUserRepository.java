@@ -8,7 +8,7 @@ import java.util.*;
 @Repository
 public class InMemoryUserRepository implements CRUDRepository<User> {
 
-    private Map<Integer, User> users = new HashMap<>();
+    private final Map<Integer, User> users = new HashMap<>();
     private int idCounter = 0;
 
     @Override

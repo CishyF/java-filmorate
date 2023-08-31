@@ -8,7 +8,7 @@ import java.util.*;
 @Repository
 public class InMemoryFilmRepository implements CRUDRepository<Film> {
 
-    private Map<Integer, Film> films = new HashMap<>();
+    private final Map<Integer, Film> films = new HashMap<>();
     private int idCounter = 0;
 
     @Override
