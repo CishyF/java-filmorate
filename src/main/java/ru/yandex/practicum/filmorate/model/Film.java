@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
@@ -28,6 +29,7 @@ public class Film {
     @Positive(message = "Продолжительность фильма должна быть положительной")
     private int duration;
 
+    @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Set<Integer> likedIds = new HashSet<>();
 

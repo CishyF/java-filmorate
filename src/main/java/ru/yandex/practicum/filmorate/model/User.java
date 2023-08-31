@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -26,6 +27,7 @@ public class User {
     @PastOrPresent(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
 
+    @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Set<Integer> friends = new HashSet<>();
 
