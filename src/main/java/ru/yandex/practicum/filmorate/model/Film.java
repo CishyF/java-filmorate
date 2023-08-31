@@ -1,12 +1,16 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.filmorate.util.validation.AfterBirthdayOfMovie;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class Film {
@@ -24,4 +28,22 @@ public class Film {
 
     @Positive(message = "Продолжительность фильма должна быть положительной")
     private int duration;
+
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    private Set<Integer> likedIds = new HashSet<>();
+
+    public void addLike(User user) {
+        final int userId = user.getId();
+        likedIds.add(userId);
+    }
+
+    public void removeLike(User user) {
+        final int userId = user.getId();
+        likedIds.remove(userId);
+    }
+
+    public int getAmountOfLikes() {
+        return likedIds.size();
+    }
 }

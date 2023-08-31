@@ -1,60 +1,92 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.*;
 
 @Slf4j
 @RestController
+@RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
-    private Map<Integer, User> users = new HashMap<>();
-    private int idCounter = 0;
+    private final UserService userService;
 
-    @GetMapping("/users")
+    @GetMapping
     public List<User> getUsers() {
-        if (users.isEmpty()) {
-            return Collections.emptyList();
-        }
+        log.info("Пришел GET-запрос /users без тела");
 
-        return new ArrayList<>(users.values());
+        List<User> users = userService.findAll();
+        log.info("Ответ на GET-запрос /users с телом={}", users);
+        return users;
     }
 
-    @PostMapping("/users")
-    public User createUser(@Valid @RequestBody User user) {
-        log.info("Пришел Post-запрос /users с телом={}", user);
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable int id) {
+        log.info("Пришел GET-запрос /users/{id={}}", id);
 
-        if (user.getName() == null) {
-            log.info("Пользователю user={} присвоено имя, соответствующее логину", user);
-            user.setName(user.getLogin());
-        }
-
-        final int id = ++idCounter;
-        user.setId(id);
-
-        users.put(id, user);
-        log.info("Пользователь user={} успешно создан", user);
+        User user = userService.findById(id);
+        log.info("Ответ на GET-запрос /users/{id={}} с телом={}", id, user);
         return user;
     }
 
-    @PutMapping ("/users")
-    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
-        log.info("Пришел Put-запрос /users с телом={}", user);
+    @GetMapping("/{id}/friends")
+    public List<User> getFriendsOfUser(@PathVariable int id) {
+        log.info("Пришел GET-запрос /users/{id={}}/friends", id);
 
-        final int id = user.getId();
+        List<User> friends = userService.getFriendsOfUser(id);
+        log.info("Ответ на GET-запрос /users/{id={}}/friends с телом={}", id, friends);
+        return friends;
+    }
 
-        if (!users.containsKey(id)) {
-            log.warn("Попытка обновить несуществующего пользователя user={}", user);
-            return new ResponseEntity<>(user, HttpStatus.NOT_FOUND);
-        }
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getFriendsIntersectionOfUsers(@PathVariable int id, @PathVariable int otherId) {
+        log.info("Пришел GET-запрос /users/{id={}}/friends/common/{otherId={}}", id, otherId);
 
-        users.put(id, user);
-        log.info("Пользователь user={} успешно обновлен", user);
-        return ResponseEntity.ok(user);
+        List<User> intersection = userService.getFriendsIntersectionOfUsers(id, otherId);
+        log.info(
+            "Ответ на GET-запрос /users/{id={}}/friends/common/{otherId={}} с телом={}", id, otherId, intersection
+        );
+        return intersection;
+    }
+
+    @PostMapping
+    public User createUser(@Valid @RequestBody User user) {
+        log.info("Пришел POST-запрос /users с телом={}", user);
+
+        User savedUser = userService.create(user);
+        log.info("Пользователь user={} успешно создан", savedUser);
+        return savedUser;
+    }
+
+    @PutMapping
+    public User updateUser(@Valid @RequestBody User user) {
+        log.info("Пришел PUT-запрос /users с телом={}", user);
+
+        User updatedUser = userService.update(user);
+        log.info("Пользователь user={} успешно обновлен", updatedUser);
+        return updatedUser;
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public User addFriendToUser(@PathVariable int id, @PathVariable int friendId) {
+        log.info("Пришел PUT-запрос /users/{id={}}/friends/{friendId={}}", id, friendId);
+
+        User user = userService.addFriendToUser(id, friendId);
+        log.info("Пользователи userId={} и friendId={} успешно добавлены в друзья, тело={}", id, friendId, user);
+        return user;
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void removeFriendOfUser(@PathVariable int id, @PathVariable int friendId) {
+        log.info("Пришел DELETE-запрос /users/{id={}}/friends/{friendId={}}", id, friendId);
+
+        userService.removeFriendOfUser(id, friendId);
+        log.info("Пользователи userId={} и friendId={} успешно удалены из друзей", id, friendId);
     }
 }
