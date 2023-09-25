@@ -19,7 +19,7 @@ public class FilmController {
 
     @GetMapping
     public List<Film> getFilms() {
-        log.info("Пришел GET-запрос /films без тела");
+        log.info("Пришел GET-запрос /films");
 
         List<Film> films = filmService.findAll();
         log.info("Ответ на GET-запрос /films с телом={}", films);
