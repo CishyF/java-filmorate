@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class FilmControllerTest {
+public class FilmControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
