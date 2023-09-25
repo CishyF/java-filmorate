@@ -22,7 +22,8 @@ public class FilmControllerTests {
     public void shouldReturn200IfFilmIsOk() throws Exception {
         mockMvc.perform(post("/films")
                 .content(
-            "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":100}"
+            "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\"," +
+            "\"duration\":100,\"rate\":4,\"mpa\":{\"id\":1}}"
                 ).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
     }
 
@@ -56,7 +57,8 @@ public class FilmControllerTests {
     public void shouldReturn200IfReleaseDateIs28December1895() throws Exception {
         mockMvc.perform(post("/films")
                 .content(
-            "{\"name\":\"Name\",\"description\":\"Description\",\"releaseDate\":\"1895-12-28\",\"duration\":200}"
+            "{\"name\":\"Name\",\"description\":\"Description\",\"releaseDate\":\"1895-12-28\"," +
+            "\"duration\":100,\"rate\":4,\"mpa\":{\"id\":1}}"
                 ).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
     }
 
@@ -80,7 +82,8 @@ public class FilmControllerTests {
     public void shouldReturn200IfDurationIsPositive() throws Exception {
         mockMvc.perform(post("/films")
                 .content(
-            "{\"name\":\"Name\",\"description\":\"Descrition\",\"releaseDate\":\"1980-03-25\",\"duration\":1}"
+            "{\"name\":\"Name\",\"description\":\"Descrition\",\"releaseDate\":\"1980-03-25\"," +
+            "\"duration\":100,\"rate\":4,\"mpa\":{\"id\":1}}"
                 ).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
     }
 }
