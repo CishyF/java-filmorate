@@ -1,12 +1,13 @@
-package ru.yandex.practicum.filmorate.repository;
+package ru.yandex.practicum.filmorate.repository.memory;
 
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.repository.FilmRepository;
 
 import java.util.*;
 
 @Repository
-public class InMemoryFilmRepository implements CRUDRepository<Film> {
+public class InMemoryFilmRepository implements FilmRepository {
 
     private final Map<Integer, Film> films = new HashMap<>();
     private int idCounter = 0;
