@@ -9,6 +9,8 @@ public interface LikeRepository {
 
     void saveLikes(Film film);
 
+    void loadLikes(List<Film> films);
+
     List<Integer> findLikesByFilmId(int filmId);
 
     void deleteLike(Film film, User user);

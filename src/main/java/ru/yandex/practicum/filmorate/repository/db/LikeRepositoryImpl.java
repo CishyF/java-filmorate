@@ -7,7 +7,12 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.LikeRepository;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.toMap;
 
 @Repository
 @RequiredArgsConstructor
@@ -29,6 +34,27 @@ public class LikeRepositoryImpl implements LikeRepository {
                 sqlQuery,
                 filmId,
                 likedUserId
+        );
+    }
+
+    @Override
+    public void loadLikes(List<Film> films) {
+        String inSql = String.join(", ", Collections.nCopies(films.size(), "?"));
+        String sqlQuery = String.format("SELECT * FROM film_like as fl " +
+                "LEFT JOIN \"user\" AS u ON fl.user_id = u.id " +
+                "WHERE u.login IS NOT NULL AND fl.film_id IN (%s);", inSql);
+        Map<Integer, Film> filmById = films.stream().collect(toMap(Film::getId, identity()));
+        jdbcTemplate.query(
+                sqlQuery,
+                (rs) -> {
+                    final int filmId = rs.getInt("film_id");
+                    final int userId = rs.getInt("user_id");
+                    Film film = filmById.get(filmId);
+                    if (film != null) {
+                        film.addLike(userId);
+                    }
+                },
+                filmById.keySet().toArray()
         );
     }
 

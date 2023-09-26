@@ -39,20 +39,29 @@ public class FilmService {
     public Film create(Film film) {
         Film savedFilm = filmRepository.save(film);
         filmGenreRepository.saveGenres(film);
-        filmGenreRepository.loadGenres(Collections.singletonList(savedFilm));
+
+        List<Film> singletonListForLoad = Collections.singletonList(savedFilm);
+        filmGenreRepository.loadGenres(singletonListForLoad);
+        likeRepository.loadLikes(singletonListForLoad);
+
         return savedFilm;
     }
 
     public Film findById(int id) {
         Film film = filmRepository.findById(id)
                 .orElseThrow(() -> new FilmDoesNotExistException("Попытка получить несуществующий фильм"));
-        filmGenreRepository.loadGenres(Collections.singletonList(film));
+
+        List<Film> singletonListForLoad = Collections.singletonList(film);
+        filmGenreRepository.loadGenres(singletonListForLoad);
+        likeRepository.loadLikes(singletonListForLoad);
+
         return film;
     }
 
     public List<Film> findAll() {
         List<Film> films = filmRepository.findAll();
         filmGenreRepository.loadGenres(films);
+        likeRepository.loadLikes(films);
         return films;
     }
 
@@ -67,7 +76,10 @@ public class FilmService {
     public Film addLikeToFilm(int filmId, int userId) {
         Film film = filmRepository.findById(filmId)
                 .orElseThrow(() -> new FilmDoesNotExistException("Попытка поставить лайк несуществующему фильму"));
-        filmGenreRepository.loadGenres(Collections.singletonList(film));
+
+        List<Film> singletonListForLoad = Collections.singletonList(film);
+        filmGenreRepository.loadGenres(singletonListForLoad);
+        likeRepository.loadLikes(singletonListForLoad);
 
         User user = userService.findById(userId);
 

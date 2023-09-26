@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.repository.db;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
@@ -18,22 +19,10 @@ import java.sql.SQLException;
 import java.util.*;
 
 @Repository
+@RequiredArgsConstructor
 public class FilmRepositoryImpl implements FilmRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final UserRepository userRepository;
-    private final LikeRepository likeRepository;
-
-    @Autowired
-    public FilmRepositoryImpl(
-            JdbcTemplate jdbcTemplate,
-            @Qualifier("userRepositoryImpl") UserRepository userRepository,
-            LikeRepository likeRepository
-    ) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.userRepository = userRepository;
-        this.likeRepository = likeRepository;
-    }
 
     @Override
     public Film save(Film film) {
@@ -124,27 +113,18 @@ public class FilmRepositoryImpl implements FilmRepository {
         jdbcTemplate.update(sqlQuery, filmId);
     }
 
-    private class FilmMapper implements RowMapper<Film> {
+    private static class FilmMapper implements RowMapper<Film> {
 
         @Override
         public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
-            int filmId = rs.getInt("id");
-            List<Integer> likes = likeRepository.findLikesByFilmId(filmId);
-
-            Film film = Film.builder()
+            return Film.builder()
+                    .id(rs.getInt("id"))
                     .mpa(makeRating(rs, 0))
                     .name(rs.getString("name"))
                     .description(rs.getString("description"))
                     .duration(rs.getInt("duration"))
-                    .id(filmId)
                     .releaseDate(rs.getDate("release_date").toLocalDate())
                     .build();
-            likes.stream().map(userRepository::findById)
-                .map(opt -> opt.orElseThrow(
-                        () -> new UserDoesNotExistException("Ошибка при получении пользователя, поставившего лайк")
-                )).forEach(film::addLike);
-
-            return film;
         }
 
         private RatingMPA makeRating(ResultSet rs, int rowNum) throws SQLException {
