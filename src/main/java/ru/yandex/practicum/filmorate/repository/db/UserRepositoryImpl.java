@@ -25,7 +25,6 @@ public class UserRepositoryImpl implements UserRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final FriendRepository friendRepository;
-    private final LikeRepository likeRepository;
 
     @Override
     public User save(User user) {
@@ -107,9 +106,6 @@ public class UserRepositoryImpl implements UserRepository {
         final int userId = user.getId();
         String sqlQuery = "DELETE FROM \"user\" WHERE id = ?;";
         jdbcTemplate.update(sqlQuery, userId);
-        likeRepository.deleteLikes(user);
-        friendRepository.deleteFriends(user);
-        friendRepository.deleteFriendFromUsers(user);
     }
 
     private class UserMapper implements RowMapper<User> {

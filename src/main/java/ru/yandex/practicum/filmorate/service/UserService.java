@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.FriendRepository;
+import ru.yandex.practicum.filmorate.repository.LikeRepository;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 
 import java.util.List;
@@ -19,14 +20,17 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
+    private final LikeRepository likeRepository;
 
     @Autowired
     public UserService(
             @Qualifier("userRepositoryImpl") UserRepository userRepository,
-            FriendRepository friendRepository
+            FriendRepository friendRepository,
+            LikeRepository likeRepository
     ) {
         this.userRepository = userRepository;
         this.friendRepository = friendRepository;
+        this.likeRepository = likeRepository;
     }
 
     public User create(User user) {
@@ -94,5 +98,12 @@ public class UserService {
 
         friends1.removeIf(friend -> !friends2.contains(friend));
         return friends1;
+    }
+
+    public void delete(User user) {
+        userRepository.delete(user);
+        likeRepository.deleteLikes(user);
+        friendRepository.deleteFriends(user);
+        friendRepository.deleteFriendFromUsers(user);
     }
 }
