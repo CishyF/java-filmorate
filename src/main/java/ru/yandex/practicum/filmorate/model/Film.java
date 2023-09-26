@@ -20,7 +20,7 @@ public class Film {
 
     private int id;
 
-    private Set<Genre> genres;
+    private final Set<Genre> genres = new HashSet<>();
 
     @NotNull
     private RatingMPA mpa;
@@ -44,6 +44,10 @@ public class Film {
     public void addLike(User user) {
         final int userId = user.getId();
         likedIds.add(userId);
+    }
+
+    public void addGenre(Genre genre) {
+        genres.add(genre);
     }
 
     public void removeLike(User user) {

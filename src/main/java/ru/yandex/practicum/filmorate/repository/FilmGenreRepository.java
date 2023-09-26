@@ -9,6 +9,8 @@ public interface FilmGenreRepository {
 
     void saveGenres(Film film);
 
+    void loadGenres(List<Film> films);
+
     List<Genre> findGenresByFilmId(int filmId);
 
     void deleteGenres(Film film);

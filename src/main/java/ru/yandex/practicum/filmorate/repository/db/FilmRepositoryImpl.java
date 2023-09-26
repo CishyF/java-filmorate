@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.exception.FilmSaveException;
 import ru.yandex.practicum.filmorate.exception.RatingDoesNotExistException;
 import ru.yandex.practicum.filmorate.exception.UserDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.RatingMPA;
 import ru.yandex.practicum.filmorate.repository.*;
 
@@ -24,8 +23,6 @@ public class FilmRepositoryImpl implements FilmRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final UserRepository userRepository;
-    private final FilmGenreRepository filmGenreRepository;
-    private final GenreRepository genreRepository;
     private final RatingRepository ratingRepository;
     private final LikeRepository likeRepository;
 
@@ -33,15 +30,11 @@ public class FilmRepositoryImpl implements FilmRepository {
     public FilmRepositoryImpl(
             JdbcTemplate jdbcTemplate,
             @Qualifier("userRepositoryImpl") UserRepository userRepository,
-            FilmGenreRepository filmGenreRepository,
-            GenreRepository genreRepository,
             RatingRepository ratingRepository,
             LikeRepository likeRepository
     ) {
         this.jdbcTemplate = jdbcTemplate;
         this.userRepository = userRepository;
-        this.filmGenreRepository = filmGenreRepository;
-        this.genreRepository = genreRepository;
         this.ratingRepository = ratingRepository;
         this.likeRepository = likeRepository;
     }
@@ -66,7 +59,6 @@ public class FilmRepositoryImpl implements FilmRepository {
                 "duration", film.getDuration()
         ));
         film.setId(id);
-        filmGenreRepository.saveGenres(film);
 
         Film savedFilm = findById(id)
                 .orElseThrow(() -> new FilmSaveException("Произошла ошибка при сохранении фильма"));
@@ -77,10 +69,6 @@ public class FilmRepositoryImpl implements FilmRepository {
         final int filmId = film.getId();
         String sqlQuery = "UPDATE film SET rating_mpa_id = ?, name = ?, description = ?, " +
                 "release_date = ?, duration = ? WHERE id = ?;";
-        if (!filmGenreRepository.findGenresByFilmId(filmId).equals(film.getGenres())) {
-            filmGenreRepository.deleteGenres(film);
-            filmGenreRepository.saveGenres(film);
-        }
         jdbcTemplate.update(
                 sqlQuery,
                 film.getMpa().getId(),
@@ -145,7 +133,6 @@ public class FilmRepositoryImpl implements FilmRepository {
                     .orElseThrow(() -> new RatingDoesNotExistException("Ошибка при получении рейтинга фильма"));
 
             int filmId = rs.getInt("id");
-            Set<Genre> genres = new HashSet<>(filmGenreRepository.findGenresByFilmId(filmId));
             List<Integer> likes = likeRepository.findLikesByFilmId(filmId);
 
             Film film = Film.builder()
@@ -155,7 +142,6 @@ public class FilmRepositoryImpl implements FilmRepository {
                     .duration(rs.getInt("duration"))
                     .id(filmId)
                     .releaseDate(rs.getDate("release_date").toLocalDate())
-                    .genres(genres)
                     .build();
             likes.stream().map(userRepository::findById)
                 .map(opt -> opt.orElseThrow(
