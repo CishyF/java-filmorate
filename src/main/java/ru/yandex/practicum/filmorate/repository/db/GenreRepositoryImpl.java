@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.repository.GenreRepository;
 
 import java.util.Collections;
@@ -36,22 +37,22 @@ public class GenreRepositoryImpl implements GenreRepository {
         );
     }
 
-    private List<Integer> getGenreIds(Set<Film.Genre> genres) {
+    private List<Integer> getGenreIds(Set<Genre> genres) {
         if (genres == null || genres.isEmpty()) {
             return Collections.emptyList();
         }
         return genres.stream()
-                .map(Film.Genre::getId)
+                .map(Genre::getId)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Film.Genre> findGenresByFilmId(int filmId) {
+    public List<Genre> findGenresByFilmId(int filmId) {
         String sqlQuery = "SELECT fg.genre_id, g.name FROM film_genre AS fg " +
                 "JOIN genre AS g ON fg.genre_id = g.id WHERE fg.film_id = ?;";
-        List<Film.Genre> genres = jdbcTemplate.query(
+        List<Genre> genres = jdbcTemplate.query(
                 sqlQuery,
-                (rs, rowNum) -> new Film.Genre(
+                (rs, rowNum) -> new Genre(
                     rs.getInt("genre_id"), rs.getString("name")
                 ),
                 filmId
@@ -60,11 +61,11 @@ public class GenreRepositoryImpl implements GenreRepository {
     }
 
     @Override
-    public Optional<Film.Genre> findById(int id) {
+    public Optional<Genre> findById(int id) {
         String sqlQuery = "SELECT * FROM genre WHERE id = ?;";
-        Film.Genre genre = jdbcTemplate.queryForObject(
+        Genre genre = jdbcTemplate.queryForObject(
                 sqlQuery,
-                (rs, rowNum) -> new Film.Genre(
+                (rs, rowNum) -> new Genre(
                         rs.getInt("id"), rs.getString("name")
                 ),
                 id
@@ -76,11 +77,11 @@ public class GenreRepositoryImpl implements GenreRepository {
     }
 
     @Override
-    public List<Film.Genre> findAll() {
+    public List<Genre> findAll() {
         String sqlQuery = "SELECT * FROM genre;";
-        List<Film.Genre> genres = jdbcTemplate.query(
+        List<Genre> genres = jdbcTemplate.query(
                 sqlQuery,
-                (rs, rowNum) -> new Film.Genre(
+                (rs, rowNum) -> new Genre(
                         rs.getInt("id"), rs.getString("name")
                 )
         );

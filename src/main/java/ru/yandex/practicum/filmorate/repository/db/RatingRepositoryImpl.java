@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.repository.db;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.RatingMPA;
 import ru.yandex.practicum.filmorate.repository.RatingRepository;
 
 import java.util.List;
@@ -16,11 +16,11 @@ class RatingRepositoryImpl implements RatingRepository {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Optional<Film.RatingMPA> findById(int id) {
+    public Optional<RatingMPA> findById(int id) {
         String sqlQuery = "SELECT * FROM rating_mpa WHERE id = ?;";
-        Film.RatingMPA rating = jdbcTemplate.queryForObject(
+        RatingMPA rating = jdbcTemplate.queryForObject(
                 sqlQuery,
-                (rs, rowNum) -> new Film.RatingMPA(
+                (rs, rowNum) -> new RatingMPA(
                         rs.getInt("id"), rs.getString("name")
                 ),
                 id
@@ -32,11 +32,11 @@ class RatingRepositoryImpl implements RatingRepository {
     }
 
     @Override
-    public List<Film.RatingMPA> findAll() {
+    public List<RatingMPA> findAll() {
         String sqlQuery = "SELECT * FROM rating_mpa;";
-        List<Film.RatingMPA> ratings = jdbcTemplate.query(
+        List<RatingMPA> ratings = jdbcTemplate.query(
                 sqlQuery,
-                (rs, rowNum) -> new Film.RatingMPA(
+                (rs, rowNum) -> new RatingMPA(
                         rs.getInt("id"), rs.getString("name")
                 )
         );

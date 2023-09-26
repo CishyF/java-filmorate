@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.RatingMPA;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -39,7 +40,7 @@ public class FilmRepositoryTests {
                     .description("adipisicing")
                     .releaseDate(LocalDate.now())
                     .duration(100)
-                    .mpa(new Film.RatingMPA(1, "G"))
+                    .mpa(new RatingMPA(1, "G"))
                     .build()
         );
     }
@@ -83,7 +84,7 @@ public class FilmRepositoryTests {
                 .description("dadidacing")
                 .releaseDate(LocalDate.now())
                 .duration(100)
-                .mpa(new Film.RatingMPA(1, "G"))
+                .mpa(new RatingMPA(1, "G"))
                 .build();
         Film savedFilm2 = filmRepository.save(film2);
 

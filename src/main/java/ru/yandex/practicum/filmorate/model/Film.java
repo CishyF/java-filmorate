@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
-import ru.yandex.practicum.filmorate.exception.GenreDoesNotExistException;
-import ru.yandex.practicum.filmorate.exception.RatingDoesNotExistException;
 import ru.yandex.practicum.filmorate.util.validation.AfterBirthdayOfMovie;
 
 import javax.validation.constraints.NotBlank;
@@ -55,45 +53,5 @@ public class Film {
 
     public int getAmountOfLikes() {
         return likedIds.size();
-    }
-
-    @Data
-    public static class Genre {
-
-        private int id;
-        @EqualsAndHashCode.Exclude
-        private String name;
-
-        public Genre(int id, String name) {
-            setId(id);
-            this.name = name;
-        }
-
-        public void setId(int id) {
-            if (id < 1 || id > 6) {
-                throw new GenreDoesNotExistException("Получен некорректный id жанра");
-            }
-            this.id = id;
-        }
-    }
-
-    @Data
-    public static class RatingMPA {
-
-        private int id;
-        @EqualsAndHashCode.Exclude
-        private String name;
-
-        public RatingMPA(int id, String name) {
-            setId(id);
-            this.name = name;
-        }
-
-        public void setId(int id) {
-            if (id < 1 || id > 5) {
-                throw new RatingDoesNotExistException("Получен некорректный id рейтинга");
-            }
-            this.id = id;
-        }
     }
 }

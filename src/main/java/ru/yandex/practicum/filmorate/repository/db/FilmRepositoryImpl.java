@@ -11,6 +11,8 @@ import ru.yandex.practicum.filmorate.exception.FilmSaveException;
 import ru.yandex.practicum.filmorate.exception.RatingDoesNotExistException;
 import ru.yandex.practicum.filmorate.exception.UserDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.RatingMPA;
 import ru.yandex.practicum.filmorate.repository.*;
 
 import java.sql.ResultSet;
@@ -138,11 +140,11 @@ public class FilmRepositoryImpl implements FilmRepository {
         @Override
         public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
             int ratingId = rs.getInt("rating_mpa_id");
-            Film.RatingMPA rating = ratingRepository.findById(ratingId)
+            RatingMPA rating = ratingRepository.findById(ratingId)
                     .orElseThrow(() -> new RatingDoesNotExistException("Ошибка при получении рейтинга фильма"));
 
             int filmId = rs.getInt("id");
-            Set<Film.Genre> genres = new HashSet<>(genreRepository.findGenresByFilmId(filmId));
+            Set<Genre> genres = new HashSet<>(genreRepository.findGenresByFilmId(filmId));
             List<Integer> likes = likeRepository.findLikesByFilmId(filmId);
 
             Film film = Film.builder()

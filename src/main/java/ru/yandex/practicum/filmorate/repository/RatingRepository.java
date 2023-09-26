@@ -1,13 +1,13 @@
 package ru.yandex.practicum.filmorate.repository;
 
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.RatingMPA;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface RatingRepository {
 
-    Optional<Film.RatingMPA> findById(int id);
+    Optional<RatingMPA> findById(int id);
 
-    List<Film.RatingMPA> findAll();
+    List<RatingMPA> findAll();
 }
