@@ -4,11 +4,12 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface GenreRepository {
+public interface FilmGenreRepository {
 
-    Optional<Genre> findById(int id);
+    void saveGenres(Film film);
 
-    List<Genre> findAll();
+    List<Genre> findGenresByFilmId(int filmId);
+
+    void deleteGenres(Film film);
 }
