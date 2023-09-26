@@ -6,7 +6,12 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.FriendRepository;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.toMap;
 
 @Repository
 @RequiredArgsConstructor
@@ -28,6 +33,27 @@ public class FriendRepositoryImpl implements FriendRepository {
                 sqlQuery,
                 userId,
                 friendId
+        );
+    }
+
+    @Override
+    public void loadFriends(List<User> users) {
+        String inSql = String.join(", ", Collections.nCopies(users.size(), "?"));
+        String sqlQuery = String.format("SELECT f.user_id, f.friend_id FROM friendship as f " +
+                "LEFT JOIN \"user\" AS u ON f.friend_id = u.id " +
+                "WHERE u.login IS NOT NULL AND f.user_id IN (%s);", inSql);
+        Map<Integer, User> userById = users.stream().collect(toMap(User::getId, identity()));
+        jdbcTemplate.query(
+                sqlQuery,
+                (rs) -> {
+                    final int userId = rs.getInt("user_id");
+                    final int friendId = rs.getInt("friend_id");
+                    User user = userById.get(userId);
+                    if (user != null) {
+                        user.addFriend(friendId);
+                    }
+                },
+                userById.keySet().toArray()
         );
     }
 

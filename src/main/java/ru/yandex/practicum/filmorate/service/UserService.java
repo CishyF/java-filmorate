@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.repository.FriendRepository;
 import ru.yandex.practicum.filmorate.repository.LikeRepository;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,17 +40,23 @@ public class UserService {
             log.info("Пользователю user={} присвоено имя, соответствующее логину", user);
             user.setName(user.getLogin());
         }
+        User savedUser = userRepository.save(user);
+        friendRepository.loadFriends(Collections.singletonList(savedUser));
 
-        return userRepository.save(user);
+        return savedUser;
     }
 
     public User findById(int id) {
-        return userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserDoesNotExistException("Попытка получить несуществующего пользователя"));
+        friendRepository.loadFriends(Collections.singletonList(user));
+        return user;
     }
 
     public List<User> findAll() {
-        return userRepository.findAll();
+        List<User> users = userRepository.findAll();
+        friendRepository.loadFriends(users);
+        return users;
     }
 
     public User update(User user) {
@@ -62,10 +69,12 @@ public class UserService {
     public User addFriendToUser(int userId, int friendId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующему пользователю друга"));
-        User friend = userRepository.findById(friendId)
+        userRepository.findById(friendId)
             .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующего пользователя в друзья"));
 
+        friendRepository.loadFriends(Collections.singletonList(user));
         user.addFriend(friendId);
+
         friendRepository.deleteFriends(user);
         friendRepository.saveFriends(user);
         return user;
@@ -84,6 +93,7 @@ public class UserService {
     public List<User> getFriendsOfUser(int id) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new UserDoesNotExistException("Попытка получить друзей несуществующего пользователя"));
+        friendRepository.loadFriends(Collections.singletonList(user));
 
         return user.getFriends().stream()
                 .map(userRepository::findById)

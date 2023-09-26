@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.UserSaveException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.repository.FriendRepository;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 
 import java.sql.ResultSet;
@@ -23,7 +22,6 @@ public class UserRepositoryImpl implements UserRepository {
 
 
     private final JdbcTemplate jdbcTemplate;
-    private final FriendRepository friendRepository;
 
     @Override
     public User save(User user) {
@@ -107,22 +105,17 @@ public class UserRepositoryImpl implements UserRepository {
         jdbcTemplate.update(sqlQuery, userId);
     }
 
-    private class UserMapper implements RowMapper<User> {
-
+    private static class UserMapper implements RowMapper<User> {
 
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-            final int userId = rs.getInt("id");
-            User user = User.builder()
-                    .id(userId)
+            return User.builder()
+                    .id(rs.getInt("id"))
                     .email(rs.getString("email"))
                     .login(rs.getString("login"))
                     .birthday(rs.getDate("birthday").toLocalDate())
                     .name(rs.getString("name"))
                     .build();
-            List<Integer> friends = friendRepository.findFriendsByUserId(userId);
-            friends.forEach(user::addFriend);
-            return user;
         }
     }
 }
