@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.FilmSaveException;
-import ru.yandex.practicum.filmorate.exception.RatingDoesNotExistException;
 import ru.yandex.practicum.filmorate.exception.UserDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.RatingMPA;
@@ -23,19 +22,16 @@ public class FilmRepositoryImpl implements FilmRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final UserRepository userRepository;
-    private final RatingRepository ratingRepository;
     private final LikeRepository likeRepository;
 
     @Autowired
     public FilmRepositoryImpl(
             JdbcTemplate jdbcTemplate,
             @Qualifier("userRepositoryImpl") UserRepository userRepository,
-            RatingRepository ratingRepository,
             LikeRepository likeRepository
     ) {
         this.jdbcTemplate = jdbcTemplate;
         this.userRepository = userRepository;
-        this.ratingRepository = ratingRepository;
         this.likeRepository = likeRepository;
     }
 
@@ -85,7 +81,9 @@ public class FilmRepositoryImpl implements FilmRepository {
 
     @Override
     public Optional<Film> findById(int id) {
-        String sqlQuery = "SELECT * FROM film WHERE id = ?;";
+        String sqlQuery = "SELECT f.id, f.name, f.description, f.rating_mpa_id, " +
+                "f.duration, f.release_date, r.name AS rating_name FROM film AS f " +
+                "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id WHERE f.id = ?;";
 
         FilmMapper mapper = new FilmMapper();
         Film film;
@@ -107,7 +105,9 @@ public class FilmRepositoryImpl implements FilmRepository {
 
     @Override
     public List<Film> findAll() {
-        String sqlQuery = "SELECT * FROM film;";
+        String sqlQuery = "SELECT f.id, f.name, f.description, f.rating_mpa_id, " +
+                "f.duration, f.release_date, r.name AS rating_name FROM film AS f " +
+                "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id;";
 
         FilmMapper mapper = new FilmMapper();
         List<Film> films = jdbcTemplate.query(
@@ -128,15 +128,11 @@ public class FilmRepositoryImpl implements FilmRepository {
 
         @Override
         public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
-            int ratingId = rs.getInt("rating_mpa_id");
-            RatingMPA rating = ratingRepository.findById(ratingId)
-                    .orElseThrow(() -> new RatingDoesNotExistException("Ошибка при получении рейтинга фильма"));
-
             int filmId = rs.getInt("id");
             List<Integer> likes = likeRepository.findLikesByFilmId(filmId);
 
             Film film = Film.builder()
-                    .mpa(rating)
+                    .mpa(makeRating(rs, 0))
                     .name(rs.getString("name"))
                     .description(rs.getString("description"))
                     .duration(rs.getInt("duration"))
@@ -149,6 +145,13 @@ public class FilmRepositoryImpl implements FilmRepository {
                 )).forEach(film::addLike);
 
             return film;
+        }
+
+        private RatingMPA makeRating(ResultSet rs, int rowNum) throws SQLException {
+            return new RatingMPA(
+                    rs.getInt("rating_mpa_id"),
+                    rs.getString("rating_name")
+            );
         }
     }
 }
