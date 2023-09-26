@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.RatingMPA;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,14 +23,17 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FilmRepositoryTests {
 
     private final FilmRepository filmRepository;
+    private final FilmService filmService;
     private Film savedFilm;
     private static final AtomicInteger expectedId = new AtomicInteger(0);
 
     @Autowired
     public FilmRepositoryTests(
-            @Qualifier("filmRepositoryImpl") FilmRepository filmRepository
+            @Qualifier("filmRepositoryImpl") FilmRepository filmRepository,
+            FilmService filmService
     ) {
         this.filmRepository = filmRepository;
+        this.filmService = filmService;
     }
 
     @BeforeEach
@@ -47,7 +51,7 @@ public class FilmRepositoryTests {
 
     @AfterEach
     public void afterEach() {
-        filmRepository.findAll().forEach(filmRepository::delete);
+        filmRepository.findAll().forEach(filmService::delete);
     }
 
     @Test

@@ -24,6 +24,7 @@ public class FilmRepositoryImpl implements FilmRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final UserRepository userRepository;
+    private final FilmGenreRepository filmGenreRepository;
     private final GenreRepository genreRepository;
     private final RatingRepository ratingRepository;
     private final LikeRepository likeRepository;
@@ -32,12 +33,14 @@ public class FilmRepositoryImpl implements FilmRepository {
     public FilmRepositoryImpl(
             JdbcTemplate jdbcTemplate,
             @Qualifier("userRepositoryImpl") UserRepository userRepository,
+            FilmGenreRepository filmGenreRepository,
             GenreRepository genreRepository,
             RatingRepository ratingRepository,
             LikeRepository likeRepository
     ) {
         this.jdbcTemplate = jdbcTemplate;
         this.userRepository = userRepository;
+        this.filmGenreRepository = filmGenreRepository;
         this.genreRepository = genreRepository;
         this.ratingRepository = ratingRepository;
         this.likeRepository = likeRepository;
@@ -63,7 +66,7 @@ public class FilmRepositoryImpl implements FilmRepository {
                 "duration", film.getDuration()
         ));
         film.setId(id);
-        genreRepository.saveGenres(film);
+        filmGenreRepository.saveGenres(film);
 
         Film savedFilm = findById(id)
                 .orElseThrow(() -> new FilmSaveException("Произошла ошибка при сохранении фильма"));
@@ -74,9 +77,9 @@ public class FilmRepositoryImpl implements FilmRepository {
         final int filmId = film.getId();
         String sqlQuery = "UPDATE film SET rating_mpa_id = ?, name = ?, description = ?, " +
                 "release_date = ?, duration = ? WHERE id = ?;";
-        if (!genreRepository.findGenresByFilmId(filmId).equals(film.getGenres())) {
-            genreRepository.deleteGenres(film);
-            genreRepository.saveGenres(film);
+        if (!filmGenreRepository.findGenresByFilmId(filmId).equals(film.getGenres())) {
+            filmGenreRepository.deleteGenres(film);
+            filmGenreRepository.saveGenres(film);
         }
         jdbcTemplate.update(
                 sqlQuery,
@@ -131,8 +134,6 @@ public class FilmRepositoryImpl implements FilmRepository {
         final int filmId = film.getId();
         String sqlQuery = "DELETE FROM film WHERE id = ?;";
         jdbcTemplate.update(sqlQuery, filmId);
-        genreRepository.deleteGenres(film);
-        likeRepository.deleteLikes(film);
     }
 
     private class FilmMapper implements RowMapper<Film> {
@@ -144,7 +145,7 @@ public class FilmRepositoryImpl implements FilmRepository {
                     .orElseThrow(() -> new RatingDoesNotExistException("Ошибка при получении рейтинга фильма"));
 
             int filmId = rs.getInt("id");
-            Set<Genre> genres = new HashSet<>(genreRepository.findGenresByFilmId(filmId));
+            Set<Genre> genres = new HashSet<>(filmGenreRepository.findGenresByFilmId(filmId));
             List<Integer> likes = likeRepository.findLikesByFilmId(filmId);
 
             Film film = Film.builder()

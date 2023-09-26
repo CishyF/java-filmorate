@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.repository.FilmGenreRepository;
 import ru.yandex.practicum.filmorate.repository.FilmRepository;
 import ru.yandex.practicum.filmorate.repository.LikeRepository;
 
@@ -17,16 +18,19 @@ import java.util.stream.Collectors;
 public class FilmService {
 
     private final FilmRepository filmRepository;
+    private final FilmGenreRepository filmGenreRepository;
     private final LikeRepository likeRepository;
     private final UserService userService;
 
     @Autowired
     public FilmService(
             @Qualifier("filmRepositoryImpl") FilmRepository filmRepository,
+            FilmGenreRepository filmGenreRepository,
             LikeRepository likeRepository,
             UserService userService
     ) {
         this.filmRepository = filmRepository;
+        this.filmGenreRepository = filmGenreRepository;
         this.likeRepository = likeRepository;
         this.userService = userService;
     }
@@ -74,5 +78,11 @@ public class FilmService {
         return filmRepository.findAll().stream()
                 .sorted(Comparator.comparingInt(Film::getAmountOfLikes).reversed())
                 .limit(count).collect(Collectors.toList());
+    }
+
+    public void delete(Film film) {
+        filmRepository.delete(film);
+        filmGenreRepository.deleteGenres(film);
+        likeRepository.deleteLikes(film);
     }
 }
