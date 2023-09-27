@@ -1,22 +1,38 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.repository.CRUDRepository;
+import ru.yandex.practicum.filmorate.repository.FriendRepository;
+import ru.yandex.practicum.filmorate.repository.LikeRepository;
+import ru.yandex.practicum.filmorate.repository.UserRepository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
-    private final CRUDRepository<User> userRepository;
+    private final UserRepository userRepository;
+    private final FriendRepository friendRepository;
+    private final LikeRepository likeRepository;
+
+    @Autowired
+    public UserService(
+            @Qualifier("userRepositoryImpl") UserRepository userRepository,
+            FriendRepository friendRepository,
+            LikeRepository likeRepository
+    ) {
+        this.userRepository = userRepository;
+        this.friendRepository = friendRepository;
+        this.likeRepository = likeRepository;
+    }
 
     public User create(User user) {
         final String userName = user.getName();
@@ -24,17 +40,23 @@ public class UserService {
             log.info("Пользователю user={} присвоено имя, соответствующее логину", user);
             user.setName(user.getLogin());
         }
+        User savedUser = userRepository.save(user);
+        friendRepository.loadFriends(Collections.singletonList(savedUser));
 
-        return userRepository.save(user);
+        return savedUser;
     }
 
     public User findById(int id) {
-        return userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserDoesNotExistException("Попытка получить несуществующего пользователя"));
+        friendRepository.loadFriends(Collections.singletonList(user));
+        return user;
     }
 
     public List<User> findAll() {
-        return userRepository.findAll();
+        List<User> users = userRepository.findAll();
+        friendRepository.loadFriends(users);
+        return users;
     }
 
     public User update(User user) {
@@ -47,10 +69,14 @@ public class UserService {
     public User addFriendToUser(int userId, int friendId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующему пользователю друга"));
-        User friend = userRepository.findById(friendId)
+        userRepository.findById(friendId)
             .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующего пользователя в друзья"));
 
-        user.addFriend(friend);
+        friendRepository.loadFriends(Collections.singletonList(user));
+        user.addFriend(friendId);
+
+        friendRepository.deleteFriends(user);
+        friendRepository.saveFriends(user);
         return user;
     }
 
@@ -61,11 +87,13 @@ public class UserService {
                 .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующего пользователя в друзья"));
 
         user.removeFriend(friend);
+        friendRepository.deleteFriend(user, friend);
     }
 
     public List<User> getFriendsOfUser(int id) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new UserDoesNotExistException("Попытка получить друзей несуществующего пользователя"));
+        friendRepository.loadFriends(Collections.singletonList(user));
 
         return user.getFriends().stream()
                 .map(userRepository::findById)
@@ -80,5 +108,12 @@ public class UserService {
 
         friends1.removeIf(friend -> !friends2.contains(friend));
         return friends1;
+    }
+
+    public void delete(User user) {
+        userRepository.delete(user);
+        likeRepository.deleteLikes(user);
+        friendRepository.deleteFriends(user);
+        friendRepository.deleteFriendFromUsers(user);
     }
 }

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,6 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@Builder
 public class User {
 
     private int id;
@@ -29,13 +31,17 @@ public class User {
 
     @JsonIgnore
     @EqualsAndHashCode.Exclude
-    private Set<Integer> friends = new HashSet<>();
+    private final Set<Integer> friends = new HashSet<>();
 
     public void addFriend(User user) {
         final int userId = user.getId();
         if (friends.add(userId)) {
             user.addFriend(this);
         }
+    }
+
+    public void addFriend(int userId) {
+        friends.add(userId);
     }
 
     public void removeFriend(User user) {

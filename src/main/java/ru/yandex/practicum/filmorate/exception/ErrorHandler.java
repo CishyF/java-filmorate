@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,7 +12,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler({FilmDoesNotExistException.class, UserDoesNotExistException.class})
+    @ExceptionHandler({
+        FilmDoesNotExistException.class, UserDoesNotExistException.class, DataAccessException.class
+    })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleDoesNotExistExceptions(RuntimeException e) {
         ErrorResponse response = new ErrorResponse(e.getMessage(), e.getClass());

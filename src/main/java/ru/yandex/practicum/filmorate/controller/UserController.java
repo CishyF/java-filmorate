@@ -19,7 +19,7 @@ public class UserController {
 
     @GetMapping
     public List<User> getUsers() {
-        log.info("Пришел GET-запрос /users без тела");
+        log.info("Пришел GET-запрос /users");
 
         List<User> users = userService.findAll();
         log.info("Ответ на GET-запрос /users с телом={}", users);
