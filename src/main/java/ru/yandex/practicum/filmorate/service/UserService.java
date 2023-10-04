@@ -5,11 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserDoesNotExistException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.repository.EventRepository;
 import ru.yandex.practicum.filmorate.repository.FriendRepository;
 import ru.yandex.practicum.filmorate.repository.LikeRepository;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -22,16 +25,19 @@ public class UserService {
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
     private final LikeRepository likeRepository;
+    private final EventRepository eventRepository;
 
     @Autowired
     public UserService(
             @Qualifier("userRepositoryImpl") UserRepository userRepository,
             FriendRepository friendRepository,
-            LikeRepository likeRepository
+            LikeRepository likeRepository,
+            EventRepository eventRepository
     ) {
         this.userRepository = userRepository;
         this.friendRepository = friendRepository;
         this.likeRepository = likeRepository;
+        this.eventRepository = eventRepository;
     }
 
     public User create(User user) {
@@ -88,6 +94,13 @@ public class UserService {
 
         user.removeFriend(friend);
         friendRepository.deleteFriend(user, friend);
+    }
+
+    public List<Event> getUserFeed(int userId) {
+        return getFriendsOfUser(userId)
+                .stream()
+                .map(friend -> eventRepository.findByUserId(friend.getId()))
+                .flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     public List<User> getFriendsOfUser(int id) {

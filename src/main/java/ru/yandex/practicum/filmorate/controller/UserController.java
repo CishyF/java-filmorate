@@ -3,11 +3,12 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -44,13 +45,22 @@ public class UserController {
         return friends;
     }
 
+    @GetMapping("/{id}/feed")
+    public List<Event> getUserFeed(@PathVariable int id) {
+        log.info("Пришел GET-запрос /users/{id={}}/feed", id);
+
+        List<Event> events = userService.getUserFeed(id);
+        log.info("Ответ на GET-запрос /users/{id={}}/feed с телом={}", id, events);
+        return events;
+    }
+
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getFriendsIntersectionOfUsers(@PathVariable int id, @PathVariable int otherId) {
         log.info("Пришел GET-запрос /users/{id={}}/friends/common/{otherId={}}", id, otherId);
 
         List<User> intersection = userService.getFriendsIntersectionOfUsers(id, otherId);
         log.info(
-            "Ответ на GET-запрос /users/{id={}}/friends/common/{otherId={}} с телом={}", id, otherId, intersection
+                "Ответ на GET-запрос /users/{id={}}/friends/common/{otherId={}} с телом={}", id, otherId, intersection
         );
         return intersection;
     }
