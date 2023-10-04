@@ -6,15 +6,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.model.EventOperation;
-import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.EventRepository;
 import ru.yandex.practicum.filmorate.repository.FriendRepository;
 import ru.yandex.practicum.filmorate.repository.LikeRepository;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 
-import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -77,18 +74,13 @@ public class UserService {
 
     public User addFriendToUser(int userId, int friendId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующему пользователю друга"));
+            .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующему пользователю друга"));
         userRepository.findById(friendId)
-                .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующего пользователя в друзья"));
+            .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующего пользователя в друзья"));
 
         friendRepository.loadFriends(Collections.singletonList(user));
         user.addFriend(friendId);
-        eventRepository.save(Event.builder()
-                .timestamp(Instant.now())
-                .userId(userId)
-                .type(EventType.FRIEND)
-                .operation(EventOperation.ADD)
-                .entityId(friendId).build());
+
         friendRepository.deleteFriends(user);
         friendRepository.saveFriends(user);
         return user;
@@ -101,12 +93,6 @@ public class UserService {
                 .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующего пользователя в друзья"));
 
         user.removeFriend(friend);
-        eventRepository.save(Event.builder()
-                .timestamp(Instant.now())
-                .userId(userId)
-                .type(EventType.FRIEND)
-                .operation(EventOperation.REMOVE)
-                .entityId(friendId).build());
         friendRepository.deleteFriend(user, friend);
     }
 
@@ -119,7 +105,7 @@ public class UserService {
 
     public List<User> getFriendsOfUser(int id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserDoesNotExistException("Попытка получить друзей несуществующего пользователя"));
+            .orElseThrow(() -> new UserDoesNotExistException("Попытка получить друзей несуществующего пользователя"));
         friendRepository.loadFriends(Collections.singletonList(user));
 
         return user.getFriends().stream()
