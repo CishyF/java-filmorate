@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -60,9 +61,18 @@ public class UserController {
 
         List<User> intersection = userService.getFriendsIntersectionOfUsers(id, otherId);
         log.info(
-                "Ответ на GET-запрос /users/{id={}}/friends/common/{otherId={}} с телом={}", id, otherId, intersection
+            "Ответ на GET-запрос /users/{id={}}/friends/common/{otherId={}} с телом={}", id, otherId, intersection
         );
         return intersection;
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public List<Film> getRecommendedFilms(@PathVariable int id) {
+        log.info("Пришел GET-запрос /users/{id={}}/recommendations", id);
+
+        List<Film> recommendedFilms = userService.getRecommendedFilms(id);
+        log.info("Ответ на GET-запрос /users/{id={}}/recommendations с телом={}", id, recommendedFilms);
+        return recommendedFilms;
     }
 
     @PostMapping

@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exception.UserDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.EventOperation;
 import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.EventRepository;
 import ru.yandex.practicum.filmorate.repository.FriendRepository;
@@ -76,9 +77,9 @@ public class UserService {
 
     public User addFriendToUser(int userId, int friendId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующему пользователю друга"));
+            .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующему пользователю друга"));
         userRepository.findById(friendId)
-                .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующего пользователя в друзья"));
+            .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующего пользователя в друзья"));
 
         friendRepository.loadFriends(Collections.singletonList(user));
         user.addFriend(friendId);
@@ -120,7 +121,7 @@ public class UserService {
 
     public List<User> getFriendsOfUser(int id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserDoesNotExistException("Попытка получить друзей несуществующего пользователя"));
+            .orElseThrow(() -> new UserDoesNotExistException("Попытка получить друзей несуществующего пользователя"));
         friendRepository.loadFriends(Collections.singletonList(user));
 
         return user.getFriends().stream()
@@ -136,6 +137,10 @@ public class UserService {
 
         friends1.removeIf(friend -> !friends2.contains(friend));
         return friends1;
+    }
+
+    public List<Film> getRecommendedFilms(int id) {
+        return Collections.emptyList();
     }
 
     public void delete(User user) {
