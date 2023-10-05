@@ -94,7 +94,7 @@ public class EventRepositoryImpl implements EventRepository {
     public void delete(Event event) {
         final int eventId = event.getId();
         String sqlQuery = "DELETE FROM event WHERE event_id = ?;";
-        jdbcTemplate.update(sqlQuery, event);
+        jdbcTemplate.update(sqlQuery, eventId);
     }
 
 
