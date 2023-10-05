@@ -91,10 +91,10 @@ public class EventRepositoryImpl implements EventRepository {
     }
 
     @Override
-    public void delete(Event film) {
-        final int filmId = film.getId();
+    public void delete(Event event) {
+        final int eventId = event.getId();
         String sqlQuery = "DELETE FROM event WHERE event_id = ?;";
-        jdbcTemplate.update(sqlQuery, filmId);
+        jdbcTemplate.update(sqlQuery, event);
     }
 
 
