@@ -12,9 +12,6 @@ import ru.yandex.practicum.filmorate.repository.EventRepository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,12 +30,12 @@ public class EventRepositoryImpl implements EventRepository {
         SimpleJdbcInsert insert = new SimpleJdbcInsert(jdbcTemplate)
                 .withSchemaName("public")
                 .withTableName("event")
-                .usingColumns("event_id", "timestamp", "user_id", "event_type", "operation", "entity_id")
+                .usingColumns("timestamp", "user_id", "event_type", "operation", "entity_id")
                 .usingGeneratedKeyColumns("event_id");
         insert.compile();
 
         int id = (int) insert.executeAndReturnKey(Map.of(
-                "timestamp", event.getDateTime().toInstant(ZoneOffset.UTC).toEpochMilli(),
+                "timestamp", event.getTimestamp(),
                 "user_id", event.getUserId(),
                 "event_type", event.getEventType(),
                 "operation", event.getOperation(),
@@ -106,7 +103,7 @@ public class EventRepositoryImpl implements EventRepository {
         String sqlQuery = "UPDATE event SET timestamp = ?,user_id = ?,event_type = ?,operation = ?, entity_id = ? WHERE eventId = ?";
         jdbcTemplate.update(
                 sqlQuery,
-                event.getDateTime().toInstant(ZoneOffset.UTC),
+                event.getTimestamp(),
                 event.getUserId(),
                 event.getEventType(),
                 event.getOperation(),
@@ -123,7 +120,7 @@ public class EventRepositoryImpl implements EventRepository {
         public Event mapRow(ResultSet rs, int rowNum) throws SQLException {
             return Event.builder()
                     .id(rs.getInt("event_id"))
-                    .dateTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(rs.getLong("timestamp")), ZoneOffset.UTC))
+                    .timestamp(rs.getLong("timestamp"))
                     .userId(rs.getInt("user_id"))
                     .eventType(rs.getString("event_type"))
                     .operation(rs.getString("operation"))

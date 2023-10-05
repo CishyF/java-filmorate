@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.EventRepository;
 import ru.yandex.practicum.filmorate.repository.FriendRepository;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +40,9 @@ public class FriendRepositoryImpl implements FriendRepository {
         );
         eventRepository.save(
                 Event.builder()
-                        .dateTime(LocalDateTime.now())
-                        .userId(userId).eventType("FRIEND")
+                        .timestamp(Instant.now().toEpochMilli())
+                        .userId(userId)
+                        .eventType("FRIEND")
                         .operation("ADD")
                         .entityId(friendId).build()
         );
@@ -91,7 +92,7 @@ public class FriendRepositoryImpl implements FriendRepository {
         );
         eventRepository.save(
                 Event.builder()
-                        .dateTime(LocalDateTime.now())
+                        .timestamp(Instant.now().toEpochMilli())
                         .userId(userId).eventType("FRIEND")
                         .operation("REMOVE")
                         .entityId(friendId).build()

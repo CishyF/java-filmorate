@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.EventRepository;
 import ru.yandex.practicum.filmorate.repository.LikeRepository;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,7 @@ public class LikeRepositoryImpl implements LikeRepository {
         );
         eventRepository.save(
                 Event.builder()
-                        .dateTime(LocalDateTime.now())
+                        .timestamp(Instant.now().toEpochMilli())
                         .userId(likedUserId).eventType("LIKE")
                         .operation("ADD")
                         .entityId(filmId).build()
@@ -92,7 +92,7 @@ public class LikeRepositoryImpl implements LikeRepository {
         );
         eventRepository.save(
                 Event.builder()
-                        .dateTime(LocalDateTime.now())
+                        .timestamp(Instant.now().toEpochMilli())
                         .userId(userId).eventType("LIKE")
                         .operation("REMOVE")
                         .entityId(filmId).build()
