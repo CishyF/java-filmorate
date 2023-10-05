@@ -13,6 +13,12 @@ public interface LikeRepository {
 
     List<Integer> findLikesByFilmId(int filmId);
 
+    List<Film> findTopFilmsByGenre(int genreId, int count);
+
+    List<Film> findTopFilmsByYear(int year, int count);
+
+    List<Film> findTopFilmsByGenreAndYear(int genreId, int year, int count);
+
     void deleteLike(Film film, User user);
 
     void deleteLikes(User user);

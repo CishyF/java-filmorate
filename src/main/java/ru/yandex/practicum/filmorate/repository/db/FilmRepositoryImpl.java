@@ -110,7 +110,7 @@ public class FilmRepositoryImpl implements FilmRepository {
         jdbcTemplate.update(sqlQuery, filmId);
     }
 
-    private static class FilmMapper implements RowMapper<Film> {
+    public static class FilmMapper implements RowMapper<Film> {
 
         @Override
         public Film mapRow(ResultSet rs, int rowNum) throws SQLException {

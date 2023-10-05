@@ -7,6 +7,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
 import java.util.*;
 
 @Slf4j
@@ -36,13 +38,16 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getTopFilmsByLikes(
-        @RequestParam(value = "count", defaultValue = "10", required = false) int count
+    public List<Film> getTopFilmsByLikesOrGenreAndYear(
+            @RequestParam(value = "count", defaultValue = "10", required = false) @Positive int count,
+            @RequestParam(value = "genreId", defaultValue = "0", required = false) @Positive int genreId,
+            @RequestParam(value = "year", defaultValue = "0", required = false) @Positive @Min(1895) int year
     ) {
-        log.info("Пришел GET-запрос /films/popular?count={}", count);
+        log.info("Пришел GET-запрос /films/popular?count={}&genreId={}&year={}", count, genreId, year);
 
-        List<Film> popularFilms = filmService.getFilmsByLikes(count);
-        log.info("Ответ на GET-запрос /films/popular?count={} с телом={}", count, popularFilms);
+        List<Film> popularFilms = filmService.findTopFilmsByLikesOrGenreAndYear(genreId, year, count);
+        log.info("Ответ на GET-запрос /films/popular?count={}&genreId={}&year={} с телом={}",
+                count, genreId, year, popularFilms);
         return popularFilms;
     }
 
