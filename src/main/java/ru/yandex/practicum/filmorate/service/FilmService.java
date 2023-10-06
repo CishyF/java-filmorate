@@ -108,8 +108,9 @@ public class FilmService {
         film.addLike(user);
         eventRepository.save(Event.builder()
                 .timestamp(Instant.now())
-                .userId(userId).eventType("LIKE")
-                .operation("ADD")
+                .userId(userId)
+                .type(EventType.LIKE)
+                .operation(EventOperation.ADD)
                 .entityId(filmId).build());
         likeRepository.deleteLikes(film);
         likeRepository.saveLikes(film);
@@ -124,8 +125,9 @@ public class FilmService {
         likeRepository.deleteLike(film, user);
         eventRepository.save(Event.builder()
                 .timestamp(Instant.now())
-                .userId(userId).eventType("LIKE")
-                .operation("REMOVE")
+                .userId(userId)
+                .type(EventType.LIKE)
+                .operation(EventOperation.REMOVE)
                 .entityId(filmId).build());
     }
 
