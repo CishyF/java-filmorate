@@ -16,9 +16,7 @@ import ru.yandex.practicum.filmorate.repository.LikeRepository;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -139,8 +137,59 @@ public class UserService {
         return friends1;
     }
 
-    public List<Film> getRecommendedFilms(int id) {
-        return Collections.emptyList();
+    public List<Film> getRecommendedFilms(List<Film> films, int id) {
+        User user = findById(id);
+
+        Optional<User> userWithMaxFilmMatchesCount = getUserWithMaxFilmMatchesCount(films, user);
+        if (userWithMaxFilmMatchesCount.isEmpty()) {
+            return Collections.emptyList();
+        }
+        User other = userWithMaxFilmMatchesCount.get();
+
+        List<Film> newRecommendedFilmsForUser = getMismatchedFilmsOfUserWithOther(films, user, other);
+        return newRecommendedFilmsForUser;
+    }
+
+    private Optional<User> getUserWithMaxFilmMatchesCount(List<Film> films, User user) {
+        final int userId = user.getId();
+
+        Map<Integer, Integer> countIntersectionsOfLikedFilmsByUserId = new HashMap<>();
+        films.stream()
+                .filter(film -> film.getLikedIds().contains(userId))
+                .flatMap(film -> film.getLikedIds().stream())
+                .filter(likedIds -> likedIds != userId)
+                .forEach(uId -> countIntersectionsOfLikedFilmsByUserId
+                        .compute(uId, (id, count) -> (count == null) ? 0 : count + 1)
+                );
+
+        Map.Entry<Integer, Integer> maxLikeIntersectionsCountEntry =
+                countIntersectionsOfLikedFilmsByUserId.entrySet()
+                        .stream()
+                        .max(Comparator.comparingInt(Map.Entry::getValue))
+                        .orElse(null);
+        if (maxLikeIntersectionsCountEntry == null) {
+            return Optional.empty();
+        }
+        final int userWithMaxFilmMatchesCount = maxLikeIntersectionsCountEntry.getKey();
+
+        return Optional.of(findById(userWithMaxFilmMatchesCount));
+    }
+
+    private List<Film> getMismatchedFilmsOfUserWithOther(List<Film> films, User user, User other) {
+        final int userId = user.getId();
+        final int otherId = other.getId();
+
+        List<Film> otherFilms = getFilmsOfUser(films, otherId);
+        List<Film> userFilms = getFilmsOfUser(films, userId);
+        otherFilms.removeIf(userFilms::contains);
+
+        return otherFilms;
+    }
+
+    private List<Film> getFilmsOfUser(List<Film> films, int userId) {
+        return films.stream()
+                .filter(film -> film.getLikedIds().contains(userId))
+                .collect(Collectors.toList());
     }
 
     public void delete(User user) {

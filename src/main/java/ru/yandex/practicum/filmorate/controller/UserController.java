@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
@@ -18,6 +19,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final FilmService filmService;
 
     @GetMapping
     public List<User> getUsers() {
@@ -70,7 +72,8 @@ public class UserController {
     public List<Film> getRecommendedFilms(@PathVariable int id) {
         log.info("Пришел GET-запрос /users/{id={}}/recommendations", id);
 
-        List<Film> recommendedFilms = userService.getRecommendedFilms(id);
+        List<Film> films = filmService.findAll();
+        List<Film> recommendedFilms = userService.getRecommendedFilms(films, id);
         log.info("Ответ на GET-запрос /users/{id={}}/recommendations с телом={}", id, recommendedFilms);
         return recommendedFilms;
     }
