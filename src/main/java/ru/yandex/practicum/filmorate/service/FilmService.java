@@ -97,10 +97,38 @@ public class FilmService {
         likeRepository.deleteLike(film, user);
     }
 
-    public List<Film> getFilmsByLikes(int count) {
-        return findAll().stream()
-                .sorted(Comparator.comparingInt(Film::getAmountOfLikes).reversed())
-                .limit(count).collect(Collectors.toList());
+    public List<Film> findTopFilmsByLikesOrGenreAndYear(int genreId, int year, int count) {
+        List<Film> films;
+
+        if (genreId > 0 && year == 0) {
+            films = filmRepository.findTopFilmsByLikesAndGenre(genreId, count);
+
+            filmGenreRepository.loadGenres(films);
+            likeRepository.loadLikes(films);
+
+            return films;
+        } else if (genreId == 0 && year > 0) {
+            films = filmRepository.findTopFilmsByLikesAndYear(year, count);
+
+            filmGenreRepository.loadGenres(films);
+            likeRepository.loadLikes(films);
+
+            return films;
+        } else if (genreId > 0 && year > 0) {
+            films = filmRepository.findTopFilmsByLikesAndGenreAndYear(genreId, year, count);
+
+            filmGenreRepository.loadGenres(films);
+            likeRepository.loadLikes(films);
+
+            return films;
+        } else {
+            films = filmRepository.findTopFilmsByLikes(count);
+
+            filmGenreRepository.loadGenres(films);
+            likeRepository.loadLikes(films);
+
+            return films;
+        }
     }
 
     public void delete(Film film) {

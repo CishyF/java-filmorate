@@ -13,5 +13,13 @@ public interface FilmRepository {
 
     List<Film> findAll();
 
+    List<Film> findTopFilmsByLikes(int count);
+
+    List<Film> findTopFilmsByLikesAndGenre(int genreId, int count);
+
+    List<Film> findTopFilmsByLikesAndYear(int year, int count);
+
+    List<Film> findTopFilmsByLikesAndGenreAndYear(int genreId, int year, int count);
+
     void delete(Film film);
 }
