@@ -3,13 +3,10 @@ package ru.yandex.practicum.filmorate.repository.db;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.repository.EventRepository;
 import ru.yandex.practicum.filmorate.repository.LikeRepository;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +19,6 @@ import static java.util.stream.Collectors.toMap;
 public class LikeRepositoryImpl implements LikeRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final EventRepository eventRepository;
 
     @Override
     public void saveLikes(Film film) {
@@ -38,13 +34,6 @@ public class LikeRepositoryImpl implements LikeRepository {
                 sqlQuery,
                 filmId,
                 likedUserId
-        );
-        eventRepository.save(
-                Event.builder()
-                        .timestamp(Instant.now().toEpochMilli())
-                        .userId(likedUserId).eventType("LIKE")
-                        .operation("ADD")
-                        .entityId(filmId).build()
         );
     }
 
@@ -89,13 +78,6 @@ public class LikeRepositoryImpl implements LikeRepository {
                 sqlQuery,
                 filmId,
                 userId
-        );
-        eventRepository.save(
-                Event.builder()
-                        .timestamp(Instant.now().toEpochMilli())
-                        .userId(userId).eventType("LIKE")
-                        .operation("REMOVE")
-                        .entityId(filmId).build()
         );
     }
 

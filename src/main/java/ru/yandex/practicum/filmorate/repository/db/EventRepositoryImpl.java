@@ -6,12 +6,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.FilmSaveException;
+import ru.yandex.practicum.filmorate.exception.EventSaveException;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.repository.EventRepository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +36,7 @@ public class EventRepositoryImpl implements EventRepository {
         insert.compile();
 
         int id = (int) insert.executeAndReturnKey(Map.of(
-                "timestamp", event.getTimestamp(),
+                "timestamp", event.getTimestamp().toEpochMilli(),
                 "user_id", event.getUserId(),
                 "event_type", event.getEventType(),
                 "operation", event.getOperation(),
@@ -43,7 +44,7 @@ public class EventRepositoryImpl implements EventRepository {
         ));
         event.setId(id);
         Event savedEvent = findById(id)
-                .orElseThrow(() -> new FilmSaveException("Произошла ошибка при сохранении события"));
+                .orElseThrow(() -> new EventSaveException("Произошла ошибка при сохранении события"));
         return savedEvent;
     }
 
@@ -103,7 +104,7 @@ public class EventRepositoryImpl implements EventRepository {
         String sqlQuery = "UPDATE event SET timestamp = ?,user_id = ?,event_type = ?,operation = ?, entity_id = ? WHERE eventId = ?";
         jdbcTemplate.update(
                 sqlQuery,
-                event.getTimestamp(),
+                event.getTimestamp().toEpochMilli(),
                 event.getUserId(),
                 event.getEventType(),
                 event.getOperation(),
@@ -111,7 +112,7 @@ public class EventRepositoryImpl implements EventRepository {
                 eventId
         );
         Event updatedEvent = findById(eventId)
-                .orElseThrow(() -> new FilmSaveException("Произошла ошибка при обновлении события"));
+                .orElseThrow(() -> new EventSaveException("Произошла ошибка при обновлении события"));
         return updatedEvent;
     }
 
@@ -120,7 +121,7 @@ public class EventRepositoryImpl implements EventRepository {
         public Event mapRow(ResultSet rs, int rowNum) throws SQLException {
             return Event.builder()
                     .id(rs.getInt("event_id"))
-                    .timestamp(rs.getLong("timestamp"))
+                    .timestamp(Instant.ofEpochMilli(rs.getLong("timestamp")))
                     .userId(rs.getInt("user_id"))
                     .eventType(rs.getString("event_type"))
                     .operation(rs.getString("operation"))

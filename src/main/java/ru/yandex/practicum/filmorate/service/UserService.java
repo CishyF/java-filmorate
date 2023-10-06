@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.repository.FriendRepository;
 import ru.yandex.practicum.filmorate.repository.LikeRepository;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -80,7 +81,12 @@ public class UserService {
 
         friendRepository.loadFriends(Collections.singletonList(user));
         user.addFriend(friendId);
-
+        eventRepository.save(Event.builder()
+                .timestamp(Instant.now())
+                .userId(userId)
+                .eventType("FRIEND")
+                .operation("ADD")
+                .entityId(friendId).build());
         friendRepository.deleteFriends(user);
         friendRepository.saveFriends(user);
         return user;
@@ -93,6 +99,11 @@ public class UserService {
                 .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующего пользователя в друзья"));
 
         user.removeFriend(friend);
+        eventRepository.save(Event.builder()
+                .timestamp(Instant.now())
+                .userId(userId).eventType("FRIEND")
+                .operation("REMOVE")
+                .entityId(friendId).build());
         friendRepository.deleteFriend(user, friend);
     }
 

@@ -3,12 +3,9 @@ package ru.yandex.practicum.filmorate.repository.db;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.repository.EventRepository;
 import ru.yandex.practicum.filmorate.repository.FriendRepository;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +18,7 @@ import static java.util.stream.Collectors.toMap;
 public class FriendRepositoryImpl implements FriendRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final EventRepository eventRepository;
+
 
     @Override
     public void saveFriends(User user) {
@@ -37,14 +34,6 @@ public class FriendRepositoryImpl implements FriendRepository {
                 sqlQuery,
                 userId,
                 friendId
-        );
-        eventRepository.save(
-                Event.builder()
-                        .timestamp(Instant.now().toEpochMilli())
-                        .userId(userId)
-                        .eventType("FRIEND")
-                        .operation("ADD")
-                        .entityId(friendId).build()
         );
     }
 
@@ -89,13 +78,6 @@ public class FriendRepositoryImpl implements FriendRepository {
                 sqlQuery,
                 userId,
                 friendId
-        );
-        eventRepository.save(
-                Event.builder()
-                        .timestamp(Instant.now().toEpochMilli())
-                        .userId(userId).eventType("FRIEND")
-                        .operation("REMOVE")
-                        .entityId(friendId).build()
         );
     }
 
