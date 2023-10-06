@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmDoesNotExistException;
+import ru.yandex.practicum.filmorate.exception.GenreDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.FilmGenreRepository;
@@ -98,35 +99,26 @@ public class FilmService {
     public List<Film> findTopFilmsByLikesOrGenreAndYear(int genreId, int year, int count) {
         List<Film> films;
 
+        if (genreId < 0 || genreId > 6) {
+            throw new GenreDoesNotExistException("Получен некорректный id жанра");
+        }
+        if (year < 0 || year > 0 && year < 1895) {
+            throw new GenreDoesNotExistException("Дата релиза должна быть не ранее 1895 года");
+        }
+
         if (genreId > 0 && year == 0) {
             films = filmRepository.findTopFilmsByLikesAndGenre(genreId, count);
-
-            filmGenreRepository.loadGenres(films);
-            likeRepository.loadLikes(films);
-
-            return films;
         } else if (genreId == 0 && year > 0) {
             films = filmRepository.findTopFilmsByLikesAndYear(year, count);
-
-            filmGenreRepository.loadGenres(films);
-            likeRepository.loadLikes(films);
-
-            return films;
-        } else if (genreId > 0 && year > 0) {
+        } else if (genreId > 0) {
             films = filmRepository.findTopFilmsByLikesAndGenreAndYear(genreId, year, count);
-
-            filmGenreRepository.loadGenres(films);
-            likeRepository.loadLikes(films);
-
-            return films;
         } else {
             films = filmRepository.findTopFilmsByLikes(count);
-
-            filmGenreRepository.loadGenres(films);
-            likeRepository.loadLikes(films);
-
-            return films;
         }
+        filmGenreRepository.loadGenres(films);
+        likeRepository.loadLikes(films);
+
+        return films;
     }
 
     public void delete(Film film) {

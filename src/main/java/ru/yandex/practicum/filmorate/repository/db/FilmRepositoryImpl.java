@@ -109,7 +109,7 @@ public class FilmRepositoryImpl implements FilmRepository {
                 "r.name AS rating_name, COUNT(fl.user_id) " +
                 "FROM film AS f " +
                 "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id " +
-                "JOIN film_like AS fl ON f.id = fl.film_id " +
+                "LEFT JOIN film_like AS fl ON f.id = fl.film_id " +
                 "GROUP BY f.id " +
                 "ORDER BY COUNT(fl.user_id) DESC " +
                 "LIMIT ?;";
@@ -121,21 +121,6 @@ public class FilmRepositoryImpl implements FilmRepository {
                 count
         );
 
-        if (films.isEmpty()) {
-            String sqlQueryWithoutLikes = "SELECT f.id, f.name, f.description, f.rating_mpa_id, f.duration, " +
-                    "f.release_date, r.name AS rating_name " +
-                    "FROM film AS f " +
-                    "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id " +
-                    "ORDER BY f.id " +
-                    "LIMIT ?;";
-
-            films = jdbcTemplate.query(
-                    sqlQueryWithoutLikes,
-                    mapper,
-                    count
-            );
-        }
-
         return films;
     }
 
@@ -146,7 +131,7 @@ public class FilmRepositoryImpl implements FilmRepository {
                 "FROM film AS f " +
                 "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id " +
                 "JOIN film_genre AS fg ON f.id = fg.film_id " +
-                "JOIN film_like AS fl ON f.id = fl.film_id " +
+                "LEFT JOIN film_like AS fl ON f.id = fl.film_id " +
                 "WHERE fg.genre_id = ? " +
                 "GROUP BY f.id " +
                 "ORDER BY COUNT(fl.user_id) DESC " +
@@ -159,23 +144,6 @@ public class FilmRepositoryImpl implements FilmRepository {
                 genreId, count
         );
 
-        if (films.isEmpty()) {
-            String sqlQueryWithoutLikes = "SELECT f.id, f.name, f.description, f.rating_mpa_id, f.duration, " +
-                    "f.release_date, r.name AS rating_name, fg.genre_id " +
-                    "FROM film AS f " +
-                    "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id " +
-                    "JOIN film_genre AS fg ON f.id = fg.film_id " +
-                    "WHERE fg.genre_id = ? " +
-                    "ORDER BY f.id " +
-                    "LIMIT ?;";
-
-            films = jdbcTemplate.query(
-                    sqlQueryWithoutLikes,
-                    mapper,
-                    genreId, count
-            );
-        }
-
         return films;
     }
 
@@ -185,7 +153,7 @@ public class FilmRepositoryImpl implements FilmRepository {
                 "r.name AS rating_name, COUNT(fl.user_id) " +
                 "FROM film AS f " +
                 "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id " +
-                "JOIN film_like AS fl ON f.id = fl.film_id " +
+                "LEFT JOIN film_like AS fl ON f.id = fl.film_id " +
                 "WHERE EXTRACT(YEAR FROM CAST(f.release_date AS date)) = ? " +
                 "GROUP BY f.id " +
                 "ORDER BY COUNT(fl.user_id) DESC " +
@@ -198,22 +166,6 @@ public class FilmRepositoryImpl implements FilmRepository {
                 year, count
         );
 
-        if (films.isEmpty()) {
-            String sqlQueryWithoutLikes = "SELECT f.id, f.name, f.description, f.rating_mpa_id, f.duration," +
-                    "f.release_date, r.name AS rating_name " +
-                    "FROM film AS f " +
-                    "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id " +
-                    "WHERE EXTRACT(YEAR FROM CAST(f.release_date AS date)) = ? " +
-                    "ORDER BY f.id " +
-                    "LIMIT ?;";
-
-            films = jdbcTemplate.query(
-                    sqlQueryWithoutLikes,
-                    mapper,
-                    year, count
-            );
-        }
-
         return films;
     }
 
@@ -224,7 +176,7 @@ public class FilmRepositoryImpl implements FilmRepository {
                 "FROM film AS f " +
                 "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id " +
                 "JOIN film_genre AS fg ON f.id = fg.film_id " +
-                "JOIN film_like AS fl ON f.id = fl.film_id " +
+                "LEFT JOIN film_like AS fl ON f.id = fl.film_id " +
                 "WHERE fg.genre_id = ? AND EXTRACT(YEAR FROM CAST(f.release_date AS date)) = ? " +
                 "GROUP BY f.id " +
                 "ORDER BY COUNT(fl.user_id) DESC " +
@@ -236,23 +188,6 @@ public class FilmRepositoryImpl implements FilmRepository {
                 mapper,
                 genreId, year, count
         );
-
-        if (films.isEmpty()) {
-            String sqlQueryWithoutLikes = "SELECT f.id, f.name, f.description, f.rating_mpa_id, f.duration, " +
-                    "f.release_date, r.name AS rating_name, fg.genre_id " +
-                    "FROM film AS f " +
-                    "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id " +
-                    "JOIN film_genre AS fg ON f.id = fg.film_id " +
-                    "WHERE fg.genre_id = ? AND EXTRACT(YEAR FROM CAST(f.release_date AS date)) = ? " +
-                    "ORDER BY f.id " +
-                    "LIMIT ?;";
-
-            films = jdbcTemplate.query(
-                    sqlQueryWithoutLikes,
-                    mapper,
-                    genreId, year, count
-            );
-        }
 
         return films;
     }
