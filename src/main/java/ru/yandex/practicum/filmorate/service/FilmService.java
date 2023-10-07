@@ -103,6 +103,20 @@ public class FilmService {
                 .limit(count).collect(Collectors.toList());
     }
 
+    public List<Film> getFilmsShared(int userId, int friendId) {
+        userService.findById(userId);
+        userService.findById(friendId);
+
+        List<Film> films = filmRepository.foundFilmsShared(userId, friendId);
+        filmGenreRepository.loadGenres(films);
+        likeRepository.loadLikes(films);
+
+        films.sort(Comparator.comparing(Film::getAmountOfLikes).reversed());
+
+        return films;
+    }
+
+
     public void delete(Film film) {
         filmRepository.delete(film);
         filmGenreRepository.deleteGenres(film);

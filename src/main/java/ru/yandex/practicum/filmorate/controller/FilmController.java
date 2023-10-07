@@ -46,6 +46,17 @@ public class FilmController {
         return popularFilms;
     }
 
+    @GetMapping("/common")
+    public List<Film> getSharedFilms(@RequestParam int userId, @RequestParam int friendId) {
+        log.info("Пришел GET-запрос /films/common?userId={}&friendId={}", userId, friendId);
+
+        List<Film> sharedFilms = filmService.getFilmsShared(userId, friendId);
+        log.info("Ответ на GET-запрос /films/common?userId={}&friendId={} с телом={}", userId,
+            friendId, sharedFilms);
+        return sharedFilms;
+    }
+
+
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
         log.info("Пришел POST-запрос /films с телом={}", film);

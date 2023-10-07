@@ -13,5 +13,7 @@ public interface FilmRepository {
 
     List<Film> findAll();
 
+    List<Film> foundFilmsShared(int userId, int friendId);
+
     void delete(Film film);
 }

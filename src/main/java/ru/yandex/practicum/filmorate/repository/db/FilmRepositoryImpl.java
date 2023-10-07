@@ -104,6 +104,28 @@ public class FilmRepositoryImpl implements FilmRepository {
     }
 
     @Override
+    public List<Film> foundFilmsShared(int userId,int friendId) {
+        String sqlQuery = "SELECT fl.film_id AS id, f.rating_mpa_id, r.name AS rating_name,\n" +
+            " f.name, f.description, f.duration, f.release_date\n" +
+            "              FROM film_like AS fl\n" +
+            "              LEFT JOIN film AS f ON f.id = fl.film_id\n" +
+            "              LEFT JOIN film_like AS f_l ON f_l.film_id = f.id\n" +
+            "              LEFT JOIN rating_mpa AS r ON f.rating_mpa_id = r.id\n" +
+            "              WHERE fl.user_id = ? AND f_l.user_id = ?";
+
+        FilmMapper mapper = new FilmMapper();
+        List<Film> films = jdbcTemplate.query(
+            sqlQuery,
+            mapper,
+            userId,
+            friendId
+        );
+
+        return films;
+    }
+
+
+    @Override
     public void delete(Film film) {
         final int filmId = film.getId();
         String sqlQuery = "DELETE FROM film WHERE id = ?;";
