@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.repository;
 
-//import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +7,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.RatingMPA;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -22,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class FilmRepositoryTests {
 
     private final FilmRepository filmRepository;
@@ -32,10 +29,8 @@ public class FilmRepositoryTests {
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public FilmRepositoryTests(
-            @Qualifier("filmRepositoryImpl") FilmRepository filmRepository,
-            FilmService filmService, JdbcTemplate jdbcTemplate
-    ) {
+    public FilmRepositoryTests(@Qualifier("filmRepositoryImpl")
+    FilmRepository filmRepository, FilmService filmService, JdbcTemplate jdbcTemplate) {
         this.filmRepository = filmRepository;
         this.filmService = filmService;
         this.jdbcTemplate = jdbcTemplate;
@@ -43,25 +38,18 @@ public class FilmRepositoryTests {
 
     @BeforeEach
     public void saveFilm() {
-        savedFilm = filmRepository.save(
-            Film.builder()
-                    .name("nisi eiusmod")
-                    .description("adipisicing")
-                    .releaseDate(LocalDate.now())
-                    .duration(100)
-                    .mpa(new RatingMPA(1, "G"))
-                    .build()
-        );
+        savedFilm = filmRepository.save(Film.builder()
+            .name("nisi eiusmod")
+            .description("adipisicing")
+            .releaseDate(LocalDate.now())
+            .duration(100)
+            .mpa(new RatingMPA(1, "G"))
+            .build());
     }
 
-    /*
-    @AfterEach
-    public void afterEach() {
-        filmRepository.findAll().forEach(filmService::delete);
-    }
-    */
     @Test
     public void shouldSaveAndReturnFilmWithExpectedId() {
+
         assertNotNull(savedFilm);
 
         final int id = expectedId.incrementAndGet();
@@ -71,6 +59,7 @@ public class FilmRepositoryTests {
 
     @Test
     public void shouldFindByExpectedIdAfterSave() {
+
         final int id = expectedId.incrementAndGet();
         Optional<Film> optionalFilm = filmRepository.findById(id);
         assertTrue(optionalFilm.isPresent());
@@ -90,12 +79,12 @@ public class FilmRepositoryTests {
     @Test
     public void shouldFindFilmsWithExpectedIds() {
         Film film2 = Film.builder()
-                .name("vfdvdfvd")
-                .description("dadidacing")
-                .releaseDate(LocalDate.now())
-                .duration(100)
-                .mpa(new RatingMPA(1, "G"))
-                .build();
+            .name("vfdvdfvd")
+            .description("dadidacing")
+            .releaseDate(LocalDate.now())
+            .duration(100)
+            .mpa(new RatingMPA(1, "G"))
+            .build();
         Film savedFilm2 = filmRepository.save(film2);
 
         final int expectedId1 = expectedId.incrementAndGet();
@@ -117,13 +106,13 @@ public class FilmRepositoryTests {
 
     @Test
     public void shouldGetFilmsSharedTest() {
-        jdbcTemplate.update("INSERT INTO film (rating_mpa_id, name, description, release_date, " +
-            "duration)\n" +
-            "VALUES (1, 'name1', 'description1', '1990-02-01', 101),\n" +
-            "       (2, 'name2', 'description2', '1990-02-02', 102),\n" +
-            "       (3, 'name3', 'description3', '1990-02-03', 103),\n" +
-            "       (3, 'name4', 'description4', '1990-02-04', 104),\n" +
-            "       (4, 'name5', 'description5', '1990-02-05', 105)");
+        jdbcTemplate.update(
+            "INSERT INTO film (rating_mpa_id, name, description, release_date, " + "duration)\n" +
+                "VALUES (1, 'name1', 'description1', '1990-02-01', 101),\n" +
+                "       (2, 'name2', 'description2', '1990-02-02', 102),\n" +
+                "       (3, 'name3', 'description3', '1990-02-03', 103),\n" +
+                "       (3, 'name4', 'description4', '1990-02-04', 104),\n" +
+                "       (4, 'name5', 'description5', '1990-02-05', 105)");
 
         jdbcTemplate.update("INSERT INTO \"user\" (email, login, name, birthday)\n" +
             "VALUES ('email1', 'login1', 'name1', '1990-01-01'),\n" +
@@ -132,30 +121,32 @@ public class FilmRepositoryTests {
             "       ('email4', 'login4', 'name4', '1990-01-04'),\n" +
             "       ('email5', 'login5', 'name5', '1990-01-05')");
 
-        jdbcTemplate.update("INSERT INTO film_genre\n" +
-            "VALUES (1, 1),\n" +
-            "       (2, 2),\n" +
-            "       (1, 3)");
+        jdbcTemplate.update(
+            "INSERT INTO film_genre\n" + "VALUES (1, 1),\n" + "       (2, 2),\n" + "       (1, 3)");
 
-        jdbcTemplate.update("INSERT INTO film_like\n" +
-            "                    VALUES (1, 1),\n" +
-            "                           (1, 2),\n" +
-            "                           (1, 3),\n" +
-            "                           (1, 4),\n" +
-            "                           (2, 1),\n" +
-            "                           (2, 2),\n" +
-            "                           (4, 1),\n" +
+        expectedId.incrementAndGet();
+        expectedId.incrementAndGet();
+        expectedId.incrementAndGet();
+        expectedId.incrementAndGet();
+        expectedId.incrementAndGet();
+        expectedId.incrementAndGet();
+
+        jdbcTemplate.update("INSERT INTO film_like\n" + "                    VALUES (1, 1),\n" +
+            "                           (1, 2),\n" + "                           (1, 3),\n" +
+            "                           (1, 4),\n" + "                           (2, 1),\n" +
+            "                           (2, 2),\n" + "                           (4, 1),\n" +
             "                           (5, 2)");
 
-        List<Film> sharedFilms = filmService.getFilmsShared(1, 2);
+        List<Film> sharedFilms = filmService.getCommonFilms(1, 2);
 
         assertEquals(2, sharedFilms.size());
 
-        assertEquals(1, sharedFilms.get(0).getId());
-        assertEquals(2, sharedFilms.get(1).getId());
+        assertEquals(1, sharedFilms.get(0)
+            .getId());
+        assertEquals(2, sharedFilms.get(1)
+            .getId());
 
     }
-
 
     @Test
     public void shouldDeleteFilmAfterSave() {

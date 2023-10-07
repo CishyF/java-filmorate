@@ -47,13 +47,13 @@ public class FilmController {
     }
 
     @GetMapping("/common")
-    public List<Film> getSharedFilms(@RequestParam int userId, @RequestParam int friendId) {
+    public List<Film> getCommonFilms(@RequestParam int userId, @RequestParam int friendId) {
         log.info("Пришел GET-запрос /films/common?userId={}&friendId={}", userId, friendId);
 
-        List<Film> sharedFilms = filmService.getFilmsShared(userId, friendId);
+        List<Film> commonFilms = filmService.getCommonFilms(userId, friendId);
         log.info("Ответ на GET-запрос /films/common?userId={}&friendId={} с телом={}", userId,
-            friendId, sharedFilms);
-        return sharedFilms;
+            friendId, commonFilms);
+        return commonFilms;
     }
 
 

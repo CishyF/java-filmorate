@@ -24,12 +24,9 @@ public class FilmService {
     private final UserService userService;
 
     @Autowired
-    public FilmService(
-            @Qualifier("filmRepositoryImpl") FilmRepository filmRepository,
-            FilmGenreRepository filmGenreRepository,
-            LikeRepository likeRepository,
-            UserService userService
-    ) {
+    public FilmService(@Qualifier("filmRepositoryImpl")
+    FilmRepository filmRepository, FilmGenreRepository filmGenreRepository,
+        LikeRepository likeRepository, UserService userService) {
         this.filmRepository = filmRepository;
         this.filmGenreRepository = filmGenreRepository;
         this.likeRepository = likeRepository;
@@ -49,7 +46,8 @@ public class FilmService {
 
     public Film findById(int id) {
         Film film = filmRepository.findById(id)
-                .orElseThrow(() -> new FilmDoesNotExistException("Попытка получить несуществующий фильм"));
+            .orElseThrow(
+                () -> new FilmDoesNotExistException("Попытка получить несуществующий фильм"));
 
         List<Film> singletonListForLoad = Collections.singletonList(film);
         filmGenreRepository.loadGenres(singletonListForLoad);
@@ -68,14 +66,16 @@ public class FilmService {
     public Film update(Film film) {
         final int filmId = film.getId();
         filmRepository.findById(filmId)
-                .orElseThrow(() -> new FilmDoesNotExistException("Попытка обновить несуществующий фильм"));
+            .orElseThrow(
+                () -> new FilmDoesNotExistException("Попытка обновить несуществующий фильм"));
         filmGenreRepository.deleteGenres(film);
         return create(film);
     }
 
     public Film addLikeToFilm(int filmId, int userId) {
         Film film = filmRepository.findById(filmId)
-                .orElseThrow(() -> new FilmDoesNotExistException("Попытка поставить лайк несуществующему фильму"));
+            .orElseThrow(() -> new FilmDoesNotExistException(
+                "Попытка поставить лайк несуществующему фильму"));
 
         List<Film> singletonListForLoad = Collections.singletonList(film);
         filmGenreRepository.loadGenres(singletonListForLoad);
@@ -91,7 +91,8 @@ public class FilmService {
 
     public void removeLikeFromFilm(int filmId, int userId) {
         Film film = filmRepository.findById(filmId)
-                .orElseThrow(() -> new FilmDoesNotExistException("Попытка убрать лайк у несуществующего фильма"));
+            .orElseThrow(() -> new FilmDoesNotExistException(
+                "Попытка убрать лайк у несуществующего фильма"));
         User user = userService.findById(userId);
 
         likeRepository.deleteLike(film, user);
@@ -99,23 +100,25 @@ public class FilmService {
 
     public List<Film> getFilmsByLikes(int count) {
         return findAll().stream()
-                .sorted(Comparator.comparingInt(Film::getAmountOfLikes).reversed())
-                .limit(count).collect(Collectors.toList());
+            .sorted(Comparator.comparingInt(Film::getAmountOfLikes)
+                .reversed())
+            .limit(count)
+            .collect(Collectors.toList());
     }
 
-    public List<Film> getFilmsShared(int userId, int friendId) {
+    public List<Film> getCommonFilms(int userId, int friendId) {
         userService.findById(userId);
         userService.findById(friendId);
 
-        List<Film> films = filmRepository.foundFilmsShared(userId, friendId);
+        List<Film> films = filmRepository.foundCommonFilms(userId, friendId);
         filmGenreRepository.loadGenres(films);
         likeRepository.loadLikes(films);
 
-        films.sort(Comparator.comparing(Film::getAmountOfLikes).reversed());
+        films.sort(Comparator.comparing(Film::getAmountOfLikes)
+            .reversed());
 
         return films;
     }
-
 
     public void delete(Film film) {
         filmRepository.delete(film);
