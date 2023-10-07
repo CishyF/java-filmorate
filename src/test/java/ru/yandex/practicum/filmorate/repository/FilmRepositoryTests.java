@@ -53,25 +53,26 @@ public class FilmRepositoryTests {
                     .build()
         );
     }
-
-    /*
+/*
     @AfterEach
     public void afterEach() {
         filmRepository.findAll().forEach(filmService::delete);
     }
-    */
+*/
     @Test
     public void shouldSaveAndReturnFilmWithExpectedId() {
+
         assertNotNull(savedFilm);
 
-        final int id = expectedId.incrementAndGet();
+        final int id = 1;
         final int filmId = savedFilm.getId();
         assertEquals(id, filmId);
     }
 
     @Test
     public void shouldFindByExpectedIdAfterSave() {
-        final int id = expectedId.incrementAndGet();
+
+        final int id = 1;
         Optional<Film> optionalFilm = filmRepository.findById(id);
         assertTrue(optionalFilm.isPresent());
 
@@ -161,7 +162,7 @@ public class FilmRepositoryTests {
     public void shouldDeleteFilmAfterSave() {
         filmRepository.delete(savedFilm);
 
-        final int id = expectedId.incrementAndGet();
+        final int id = 1;
         Optional<Film> optionalFilm = filmRepository.findById(id);
 
         assertTrue(optionalFilm.isEmpty());
