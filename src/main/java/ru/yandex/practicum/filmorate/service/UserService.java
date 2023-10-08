@@ -137,20 +137,7 @@ public class UserService {
         return friends1;
     }
 
-    public List<Film> getRecommendedFilms(List<Film> films, int id) {
-        User user = findById(id);
-
-        Optional<User> userWithMaxFilmMatchesCount = getUserWithMaxFilmMatchesCount(films, user);
-        if (userWithMaxFilmMatchesCount.isEmpty()) {
-            return Collections.emptyList();
-        }
-        User other = userWithMaxFilmMatchesCount.get();
-
-        List<Film> newRecommendedFilmsForUser = getMismatchedFilmsOfUserWithOther(films, user, other);
-        return newRecommendedFilmsForUser;
-    }
-
-    private Optional<User> getUserWithMaxFilmMatchesCount(List<Film> films, User user) {
+    public Optional<User> getUserWithMaxFilmMatchesCount(List<Film> films, User user) {
         final int userId = user.getId();
 
         Map<Integer, Integer> countIntersectionsOfLikedFilmsByUserId = new HashMap<>();
@@ -173,23 +160,6 @@ public class UserService {
         final int userWithMaxFilmMatchesCount = maxLikeIntersectionsCountEntry.getKey();
 
         return Optional.of(findById(userWithMaxFilmMatchesCount));
-    }
-
-    private List<Film> getMismatchedFilmsOfUserWithOther(List<Film> films, User user, User other) {
-        final int userId = user.getId();
-        final int otherId = other.getId();
-
-        List<Film> otherFilms = getFilmsOfUser(films, otherId);
-        List<Film> userFilms = getFilmsOfUser(films, userId);
-        otherFilms.removeIf(userFilms::contains);
-
-        return otherFilms;
-    }
-
-    private List<Film> getFilmsOfUser(List<Film> films, int userId) {
-        return films.stream()
-                .filter(film -> film.getLikedIds().contains(userId))
-                .collect(Collectors.toList());
     }
 
     public void delete(User user) {

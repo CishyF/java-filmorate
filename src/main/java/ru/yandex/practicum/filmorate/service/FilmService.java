@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,7 +43,6 @@ public class FilmService {
         this.eventRepository = eventRepository;
         this.likeRepository = likeRepository;
         this.userService = userService;
-
     }
 
     public Film create(Film film) {
@@ -99,8 +99,8 @@ public class FilmService {
         User user = userService.findById(userId);
 
         film.addLike(user);
-      likeRepository.deleteLikes(film);
-      likeRepository.saveLikes(film);
+        likeRepository.deleteLikes(film);
+        likeRepository.saveLikes(film);
         eventRepository.save(Event.builder()
                 .timestamp(Instant.now().toEpochMilli())
                 .userId(userId)
@@ -152,6 +152,37 @@ public class FilmService {
                                         .anyMatch(id -> id == directorId)
                 ).collect(Collectors.toList());
      }
+
+    public List<Film> getRecommendedFilms(int id) {
+        List<Film> films = findAll();
+        User user = userService.findById(id);
+
+        Optional<User> userWithMaxFilmMatchesCount = userService.getUserWithMaxFilmMatchesCount(films, user);
+        if (userWithMaxFilmMatchesCount.isEmpty()) {
+            return Collections.emptyList();
+        }
+        User other = userWithMaxFilmMatchesCount.get();
+
+        List<Film> newRecommendedFilmsForUser = getMismatchedFilmsOfUserWithOther(user, other);
+        return newRecommendedFilmsForUser;
+    }
+
+    private List<Film> getMismatchedFilmsOfUserWithOther(User user, User other) {
+        final int userId = user.getId();
+        final int otherId = other.getId();
+
+        List<Film> otherFilms = getFilmsOfUser(otherId);
+        List<Film> userFilms = getFilmsOfUser(userId);
+        otherFilms.removeIf(userFilms::contains);
+
+        return otherFilms;
+    }
+
+    public List<Film> getFilmsOfUser(int userId) {
+        return findAll().stream()
+                .filter(film -> film.getLikedIds().contains(userId))
+                .collect(Collectors.toList());
+    }
 
     public void delete(Film film) {
         filmRepository.delete(film);
