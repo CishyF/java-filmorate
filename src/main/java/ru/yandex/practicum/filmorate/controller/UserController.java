@@ -69,12 +69,11 @@ public class UserController {
     }
 
     @GetMapping("/{id}/recommendations")
-    public List<Film> getRecommendedFilms(@PathVariable int id) {
-        log.info("Пришел GET-запрос /users/{id={}}/recommendations", id);
+    public List<Film> getRecommendedFilms(@PathVariable("id") int userId) {
+        log.info("Пришел GET-запрос /users/{id={}}/recommendations", userId);
 
-        List<Film> films = filmService.findAll();
-        List<Film> recommendedFilms = userService.getRecommendedFilms(films, id);
-        log.info("Ответ на GET-запрос /users/{id={}}/recommendations с телом={}", id, recommendedFilms);
+        List<Film> recommendedFilms = filmService.getRecommendedFilms(userId);
+        log.info("Ответ на GET-запрос /users/{id={}}/recommendations с телом={}", userId, recommendedFilms);
         return recommendedFilms;
     }
 
