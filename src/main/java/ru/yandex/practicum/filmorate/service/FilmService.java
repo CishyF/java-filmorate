@@ -49,7 +49,7 @@ public class FilmService {
 
     public Film findById(int id) {
         Film film = filmRepository.findById(id)
-                .orElseThrow(() -> new FilmDoesNotExistException("Попытка получить несуществующий фильм"));
+            .orElseThrow(() -> new FilmDoesNotExistException("Попытка получить несуществующий фильм"));
 
         List<Film> singletonListForLoad = Collections.singletonList(film);
         filmGenreRepository.loadGenres(singletonListForLoad);
@@ -103,11 +103,11 @@ public class FilmService {
                 .limit(count).collect(Collectors.toList());
     }
 
-    public List<Film> getFilmsShared(int userId, int friendId) {
+    public List<Film> getCommonFilms(int userId, int friendId) {
         userService.findById(userId);
         userService.findById(friendId);
 
-        List<Film> films = filmRepository.foundFilmsShared(userId, friendId);
+        List<Film> films = filmRepository.foundCommonFilms(userId, friendId);
         filmGenreRepository.loadGenres(films);
         likeRepository.loadLikes(films);
 
@@ -115,7 +115,6 @@ public class FilmService {
 
         return films;
     }
-
 
     public void delete(Film film) {
         filmRepository.delete(film);

@@ -41,16 +41,8 @@ public class InMemoryFilmRepository implements FilmRepository {
     }
 
     @Override
-    public List<Film> foundFilmsShared(int userId, int friendId) {
-        List<Film> sharedFilms = new ArrayList<>();
-
-        for (Film film : films.values()) {
-            if (film.getLikedIds().contains(userId) && film.getLikedIds().contains(friendId)) {
-                sharedFilms.add(film);
-            }
-        }
-
-        return sharedFilms;
+    public List<Film> foundCommonFilms(int userId, int friendId) {
+        throw new RuntimeException("Checkpoint not supported");
     }
 
     @Override
