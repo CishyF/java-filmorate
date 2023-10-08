@@ -124,12 +124,19 @@ public class FilmRepositoryTests {
             "       ('email5', 'login5', 'name5', '1990-01-05')");
 
         jdbcTemplate.update(
-            "INSERT INTO film_genre\n" + "VALUES (1, 1),\n" + "       (2, 2),\n" + "       (1, 3)");
+            "INSERT INTO film_genre\n" +
+                "VALUES (1, 1),\n" +
+                "       (2, 2),\n" +
+                "       (1, 3)");
 
-        jdbcTemplate.update("INSERT INTO film_like\n" + "                    VALUES (1, 1),\n" +
-            "                           (1, 2),\n" + "                           (1, 3),\n" +
-            "                           (1, 4),\n" + "                           (2, 1),\n" +
-            "                           (2, 2),\n" + "                           (4, 1),\n" +
+        jdbcTemplate.update("INSERT INTO film_like\n" +
+            "                    VALUES (1, 1),\n" +
+            "                           (1, 2),\n" +
+            "                           (1, 3),\n" +
+            "                           (1, 4),\n" +
+            "                           (2, 1),\n" +
+            "                           (2, 2),\n" +
+            "                           (4, 1),\n" +
             "                           (5, 2)");
 
         List<Film> sharedFilms = filmService.getFilmsShared(1, 2);

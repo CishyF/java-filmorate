@@ -49,7 +49,7 @@ public class FilmService {
 
     public Film findById(int id) {
         Film film = filmRepository.findById(id)
-                .orElseThrow(() -> new FilmDoesNotExistException("Попытка получить несуществующий фильм"));
+            .orElseThrow(() -> new FilmDoesNotExistException("Попытка получить несуществующий фильм"));
 
         List<Film> singletonListForLoad = Collections.singletonList(film);
         filmGenreRepository.loadGenres(singletonListForLoad);
@@ -115,7 +115,6 @@ public class FilmService {
 
         return films;
     }
-
 
     public void delete(Film film) {
         filmRepository.delete(film);
