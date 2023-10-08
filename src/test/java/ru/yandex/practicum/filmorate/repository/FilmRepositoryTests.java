@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.yandex.practicum.filmorate.exception.FilmDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.RatingMPA;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -107,6 +108,31 @@ public class FilmRepositoryTests {
         assertEquals(savedFilm2, actualFilm2);
         assertEquals(expectedId1, actualFilm1.getId());
         assertEquals(expectedId2, actualFilm2.getId());
+    }
+
+    @Test
+    public void shouldDeleteFilmById() {
+        Film film2 = Film.builder()
+            .name("vfdvdfvd")
+            .description("dadidacing")
+            .releaseDate(LocalDate.now())
+            .duration(100)
+            .mpa(new RatingMPA(1, "G"))
+            .build();
+        Film savedFilm2 = filmRepository.save(film2);
+
+        int id = savedFilm2.getId();
+
+        Film deletedFilm2 = filmService.deleteById(id);
+
+        assertEquals(savedFilm2.getId(), deletedFilm2.getId());
+
+        FilmDoesNotExistException exc = assertThrows(FilmDoesNotExistException.class,
+            () -> filmService.findById(deletedFilm2.getId()));
+        assertEquals("Попытка получить несуществующий фильм", exc.getMessage());
+
+        expectedId.incrementAndGet();
+        expectedId.incrementAndGet();
     }
 
     @Test

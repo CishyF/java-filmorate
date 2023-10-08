@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.yandex.practicum.filmorate.exception.UserDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -28,28 +29,25 @@ public class UserRepositoryTests {
 
     @Autowired
     public UserRepositoryTests(
-            @Qualifier("userRepositoryImpl") UserRepository userRepository,
-            UserService userService
-    ) {
+        @Qualifier("userRepositoryImpl") UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
         this.userService = userService;
     }
 
     @BeforeEach
     public void saveUser() {
-        savedUser = userRepository.save(
-            User.builder()
-                    .name("fkdsl")
-                    .login("fdsf")
-                    .email("fedorovn@yandex.ru")
-                    .birthday(LocalDate.now())
-                    .build()
-        );
+        savedUser = userRepository.save(User.builder()
+            .name("fkdsl")
+            .login("fdsf")
+            .email("fedorovn@yandex.ru")
+            .birthday(LocalDate.now())
+            .build());
     }
 
     @AfterEach
     public void afterEach() {
-        userRepository.findAll().forEach(userService::delete);
+        userRepository.findAll()
+            .forEach(userService::delete);
     }
 
     @Test
@@ -82,11 +80,11 @@ public class UserRepositoryTests {
     @Test
     public void shouldFindUsersWithExpectedIds() {
         User user2 = User.builder()
-                .name("fkds")
-                .login("fdsfsdf")
-                .email("fedorov@yandex.ru")
-                .birthday(LocalDate.now())
-                .build();
+            .name("fkds")
+            .login("fdsfsdf")
+            .email("fedorov@yandex.ru")
+            .birthday(LocalDate.now())
+            .build();
         User savedUser2 = userRepository.save(user2);
 
         final int expectedId1 = expectedId.incrementAndGet();
@@ -104,6 +102,28 @@ public class UserRepositoryTests {
         assertEquals(savedUser2, actualUser2);
         assertEquals(expectedId1, actualUser1.getId());
         assertEquals(expectedId2, actualUser2.getId());
+    }
+
+    @Test
+    public void shouldDeleteUserById() {
+        User user2 = User.builder()
+            .name("fkds")
+            .login("fdsfsdf")
+            .email("fedorov@yandex.ru")
+            .birthday(LocalDate.now())
+            .build();
+        User savedUser2 = userRepository.save(user2);
+
+        User user = userService.deleteById(savedUser2.getId());
+
+        assertEquals(5, user.getId());
+
+        UserDoesNotExistException exc = assertThrows(UserDoesNotExistException.class,
+            () -> userService.findById(savedUser2.getId()));
+        assertEquals("Попытка получить несуществующего пользователя", exc.getMessage());
+
+        expectedId.incrementAndGet();
+        expectedId.incrementAndGet();
     }
 
     @Test
