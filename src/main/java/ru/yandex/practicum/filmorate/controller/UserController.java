@@ -45,13 +45,13 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getFriendsIntersectionOfUsers(@PathVariable int id, @PathVariable int otherId) {
+    public List<User> getFriendsIntersectionOfUsers(
+        @PathVariable int id, @PathVariable int otherId) {
         log.info("Пришел GET-запрос /users/{id={}}/friends/common/{otherId={}}", id, otherId);
 
         List<User> intersection = userService.getFriendsIntersectionOfUsers(id, otherId);
-        log.info(
-            "Ответ на GET-запрос /users/{id={}}/friends/common/{otherId={}} с телом={}", id, otherId, intersection
-        );
+        log.info("Ответ на GET-запрос /users/{id={}}/friends/common/{otherId={}} с телом={}", id,
+            otherId, intersection);
         return intersection;
     }
 
@@ -78,7 +78,8 @@ public class UserController {
         log.info("Пришел PUT-запрос /users/{id={}}/friends/{friendId={}}", id, friendId);
 
         User user = userService.addFriendToUser(id, friendId);
-        log.info("Пользователи userId={} и friendId={} успешно добавлены в друзья, тело={}", id, friendId, user);
+        log.info("Пользователи userId={} и friendId={} успешно добавлены в друзья, тело={}", id,
+            friendId, user);
         return user;
     }
 

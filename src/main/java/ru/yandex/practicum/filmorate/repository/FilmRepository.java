@@ -13,7 +13,9 @@ public interface FilmRepository {
 
     List<Film> findAll();
 
-    List<Film> foundFilmsShared(int userId, int friendId);
+    default List<Film> foundCommonFilms(int userId, int friendId) {
+        return null;
+    }
 
     void delete(Film film);
 }
