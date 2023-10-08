@@ -64,15 +64,6 @@ public class FilmController {
         return updatedFilm;
     }
 
-    @DeleteMapping("/{filmId}")
-    public Film deleteFilm(@PathVariable int filmId) {
-        log.info("Пришел Delete-запрос /films с телом={}", filmId);
-
-        Film deletedFilm = filmService.deleteById(filmId);
-        log.info("Фильм film={} успешно удалён", deletedFilm);
-        return deletedFilm;
-    }
-
     @PutMapping("/{id}/like/{userId}")
     public Film addLikeToFilm(@PathVariable("id") int filmId, @PathVariable int userId) {
         log.info("Пришел PUT-запрос /films/{id={}}/like/{userId={}}", filmId, userId);
@@ -80,6 +71,14 @@ public class FilmController {
         Film likedFilm = filmService.addLikeToFilm(filmId, userId);
         log.info("Лайк фильму film={} от пользователя с id={} поставлен", likedFilm, userId);
         return likedFilm;
+    }
+
+    @DeleteMapping("/{filmId}")
+    public void deleteFilm(@PathVariable int filmId) {
+        log.info("Пришел DELETE-запрос /films/{}", filmId);
+
+        Film deletedFilm = filmService.deleteById(filmId);
+        log.info("Фильм film={} успешно удалён", deletedFilm);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
