@@ -73,6 +73,12 @@ public class FilmService {
         return create(film);
     }
 
+    public Film deleteById(int filmId) {
+        Film film = findById(filmId);
+        delete(film);
+        return film;
+    }
+
     public Film addLikeToFilm(int filmId, int userId) {
         Film film = filmRepository.findById(filmId)
                 .orElseThrow(() -> new FilmDoesNotExistException("Попытка поставить лайк несуществующему фильму"));

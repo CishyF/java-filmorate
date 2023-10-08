@@ -66,6 +66,12 @@ public class UserService {
         return create(user);
     }
 
+    public User deleteById(int userId) {
+        User user = findById(userId);
+        delete(user);
+        return user;
+    }
+
     public User addFriendToUser(int userId, int friendId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserDoesNotExistException("Попытка добавить несуществующему пользователю друга"));
