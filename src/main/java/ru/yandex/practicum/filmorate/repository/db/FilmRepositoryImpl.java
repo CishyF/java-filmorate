@@ -104,7 +104,7 @@ public class FilmRepositoryImpl implements FilmRepository {
     }
 
     @Override
-    public List<Film> foundFilmsShared(int userId,int friendId) {
+    public List<Film> foundCommonFilms(int userId,int friendId) {
         String sqlQuery = "SELECT fl.film_id AS id, f.rating_mpa_id, r.name AS rating_name,\n" +
             " f.name, f.description, f.duration, f.release_date\n" +
             "              FROM film_like AS fl\n" +

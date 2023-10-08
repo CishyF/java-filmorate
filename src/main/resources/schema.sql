@@ -1,6 +1,3 @@
-DROP TABLE IF EXISTS "user" CASCADE;
-DROP TABLE IF EXISTS film CASCADE;
-
 CREATE TABLE IF NOT EXISTS genre (
     id integer PRIMARY KEY,
     name varchar(32) NOT NULL
