@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.*;
 
 @Slf4j
@@ -47,6 +48,27 @@ public class FilmController {
         log.info("Ответ на GET-запрос /films/popular?count={}&genreId={}&year={} с телом={}",
                 count, genreId, year, popularFilms);
         return popularFilms;
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getTopFilmsOfDirectorByLikesOrReleaseYear(
+            @PathVariable int directorId,
+            @RequestParam(value = "sortBy", defaultValue = "") @NotBlank String sortBy
+    ) {
+        log.info("Пришел GET-запрос /films/director/{directorId={}}?sortBy={}", directorId, sortBy);
+
+        List<Film> directorTopFilms = Collections.emptyList();
+        switch (sortBy.toLowerCase()) {
+            case "likes":
+                directorTopFilms = filmService.getDirectorFilmsByLikes(directorId);
+                break;
+            case "year":
+                directorTopFilms = filmService.getDirectorFilmsByYear(directorId);
+        }
+        log.info("Ответ на GET-запрос /films/director/{directorId={}}?sortBy={} с телом={}",
+                directorId, sortBy, directorTopFilms
+        );
+        return directorTopFilms;
     }
 
     @PostMapping
