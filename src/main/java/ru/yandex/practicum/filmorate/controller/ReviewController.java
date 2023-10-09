@@ -60,37 +60,37 @@ public class ReviewController {
 
 
     @PutMapping("/{id}/like/{userId}")
-    public Film addLikeToFilm(@PathVariable("id") int filmId, @PathVariable int userId) {
-        log.info("Пришел PUT-запрос /films/{id={}}/like/{userId={}}", filmId, userId);
+    public Review addLikeToReview(@PathVariable("id") int reviewId, @PathVariable int userId) {
+        log.info("Пришел PUT-запрос /reviews/{id={}}/like/{userId={}}", reviewId, userId);
 
-        Film likedFilm = filmService.addLikeToFilm(filmId, userId);
-        log.info("Лайк фильму film={} от пользователя с id={} поставлен", likedFilm, userId);
-        return likedFilm;
+        Review likedReview = reviewService.addLikeToReview(reviewId, userId, true);
+        log.info("Лайк отзыву review={} от пользователя с id={} поставлен", likedReview, userId);
+        return likedReview;
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public void removeLikeFromFilm(@PathVariable("id") int filmId, @PathVariable int userId) {
-        log.info("Пришел DELETE-запрос /films/{id={}}/like/{userId={}}", filmId, userId);
+    public void removeLikeFromReview(@PathVariable("id") int reviewId, @PathVariable int userId) {
+        log.info("Пришел DELETE-запрос /reviews/{id={}}/like/{userId={}}", reviewId, userId);
 
-        filmService.removeLikeFromFilm(filmId, userId);
-        log.info("Лайк у фильма id={} от пользователя id={} удален", filmId, userId);
+        reviewService.removeLikeFromReview(reviewId, userId);
+        log.info("Лайк у отзыва id={} от пользователя id={} удален", reviewId, userId);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
-    public Film addDislikeToFilm(@PathVariable("id") int filmId, @PathVariable int userId) {
-        log.info("Пришел PUT-запрос /films/{id={}}/like/{userId={}}", filmId, userId);
+    public Review addDislikeToFilm(@PathVariable("id") int reviewId, @PathVariable int userId) {
+        log.info("Пришел PUT-запрос /reviews/{id={}}/dislike/{userId={}}", reviewId, userId);
 
-        Film likedFilm = filmService.addLikeToFilm(filmId, userId);
-        log.info("Лайк фильму film={} от пользователя с id={} поставлен", likedFilm, userId);
-        return likedFilm;
+        Review likedReview = reviewService.addLikeToReview(reviewId, userId, false);
+        log.info("Дизлайк отзыву film={} от пользователя с id={} поставлен", likedReview, userId);
+        return likedReview;
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
-    public void removeDislikeFromFilm(@PathVariable("id") int filmId, @PathVariable int userId) {
-        log.info("Пришел DELETE-запрос /films/{id={}}/like/{userId={}}", filmId, userId);
+    public void removeDislikeFromReview(@PathVariable("id") int reviewId, @PathVariable int userId) {
+        log.info("Пришел DELETE-запрос /reviews/{id={}}/dislike/{userId={}}", reviewId, userId);
 
-        filmService.removeLikeFromFilm(filmId, userId);
-        log.info("Лайк у фильма id={} от пользователя id={} удален", filmId, userId);
+        reviewService.removeLikeFromReview(reviewId, userId);
+        log.info("Дизлайк у отзыва id={} от пользователя id={} удален", reviewId, userId);
     }
 
 }

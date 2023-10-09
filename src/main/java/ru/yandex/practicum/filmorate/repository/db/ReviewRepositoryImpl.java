@@ -115,6 +115,7 @@ public class ReviewRepositoryImpl implements ReviewRepository {
                     .isPositive(rs.getBoolean("is_positive"))
                     .userId(rs.getInt("user_id"))
                     .filmId(rs.getInt("film_id"))
+                    .useful(rs.getInt("useful"))
                     .build();
         }
     }
