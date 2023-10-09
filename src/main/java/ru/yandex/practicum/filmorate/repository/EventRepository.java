@@ -15,5 +15,5 @@ public interface EventRepository {
 
     List<Event> findAll();
 
-    void delete(Event film);
+    void delete(Event event);
 }
