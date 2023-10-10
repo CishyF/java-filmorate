@@ -14,15 +14,15 @@ public interface FilmRepository {
     List<Film> findAll();
 
     default List<Film> findTopFilmsByLikes(int count) {
-        throw new RuntimeException("Not Emplemented");
+        throw new RuntimeException("Not Implemented");
     }
 
     default List<Film> findTopFilmsByLikesAndGenre(int genreId, int count) {
-        throw new RuntimeException("Not Emplemented");
+        throw new RuntimeException("Not Implemented");
     }
 
     default List<Film> findTopFilmsByLikesAndYear(int year, int count) {
-        throw new RuntimeException("Not Emplemented");
+        throw new RuntimeException("Not Implemented");
     }
 
     default List<Film> findTopFilmsByLikesAndGenreAndYear(int genreId, int year, int count) {
