@@ -13,13 +13,21 @@ public interface FilmRepository {
 
     List<Film> findAll();
 
-    List<Film> findTopFilmsByLikes(int count);
+    default List<Film> findTopFilmsByLikes(int count) {
+        throw new RuntimeException("Not Emplemented");
+    }
 
-    List<Film> findTopFilmsByLikesAndGenre(int genreId, int count);
+    default List<Film> findTopFilmsByLikesAndGenre(int genreId, int count) {
+        throw new RuntimeException("Not Emplemented");
+    }
 
-    List<Film> findTopFilmsByLikesAndYear(int year, int count);
+    default List<Film> findTopFilmsByLikesAndYear(int year, int count) {
+        throw new RuntimeException("Not Emplemented");
+    }
 
-    List<Film> findTopFilmsByLikesAndGenreAndYear(int genreId, int year, int count);
+    default List<Film> findTopFilmsByLikesAndGenreAndYear(int genreId, int year, int count) {
+        throw new RuntimeException("Not Emplemented");
+    }
 
     void delete(Film film);
 }

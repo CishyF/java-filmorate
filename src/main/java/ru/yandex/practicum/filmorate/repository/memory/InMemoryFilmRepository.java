@@ -5,7 +5,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.repository.FilmRepository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryFilmRepository implements FilmRepository {
@@ -39,28 +38,6 @@ public class InMemoryFilmRepository implements FilmRepository {
             return Collections.emptyList();
         }
         return new ArrayList<>(films.values());
-    }
-
-    @Override
-    public List<Film> findTopFilmsByLikes(int count) {
-        return findAll().stream()
-                .sorted(Comparator.comparingInt(Film::getAmountOfLikes).reversed())
-                .limit(count).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Film> findTopFilmsByLikesAndGenre(int genreId, int count) {
-        return null;
-    }
-
-    @Override
-    public List<Film> findTopFilmsByLikesAndYear(int year, int count) {
-        return null;
-    }
-
-    @Override
-    public List<Film> findTopFilmsByLikesAndGenreAndYear(int genreId, int year, int count) {
-        return null;
     }
 
     @Override
