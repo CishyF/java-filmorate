@@ -39,6 +39,13 @@ public class ReviewController {
         return review;
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteReview(@PathVariable("id") int reviewId) {
+        log.info("Пришел DELETE-запрос /reviews/{id={}}", reviewId);
+        Review review = reviewService.findById(reviewId);
+        reviewService.delete(review);
+        log.info("Отзыв с id={} удален", reviewId);
+    }
 
     @PostMapping
     public Review createReview(@Valid @RequestBody Review review) {

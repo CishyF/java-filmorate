@@ -61,15 +61,14 @@ CREATE TABLE IF NOT EXISTS review(
     content text NOT NULL,
     is_positive boolean NOT NULL,
     useful integer NOT NULL DEFAULT 0,
-    user_id NOT NULL REFERENCES "user"(id),
-    film_id NOT NULL REFERENCES film(id),
-
+    user_id integer NOT NULL REFERENCES "user"(id),
+    film_id integer NOT NULL REFERENCES film(id)
 );
 
 CREATE TABLE IF NOT EXISTS review_like(
     review_id integer NOT NULL REFERENCES review(review_id),
     user_id integer NOT NULL REFERENCES "user"(id),
-    like integer NOT NULL,
+    "like" integer NOT NULL,
     UNIQUE(review_id,user_id),
-    CONSTRAINT fk_like_review CHECK(like IN(-1,1))
+    CONSTRAINT fk_like_review CHECK("like" IN(-1,1))
 );

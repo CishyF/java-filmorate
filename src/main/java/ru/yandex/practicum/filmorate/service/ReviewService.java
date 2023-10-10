@@ -87,8 +87,8 @@ public class ReviewService {
 
 
     public void delete(Review review) {
-        reviewRepository.delete(review);
         reviewLikeRepository.deleteLikes(review);
+        reviewRepository.delete(review);
     }
 
 }

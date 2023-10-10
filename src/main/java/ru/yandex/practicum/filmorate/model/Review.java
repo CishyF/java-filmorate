@@ -1,7 +1,10 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.*;
 
@@ -10,11 +13,14 @@ import java.util.*;
 public class Review {
     private int id;
     private String content;
+    @JsonProperty("isPositive")
     private boolean isPositive;
     private int userId;
     private int filmId;
     private int useful;
 
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private final Map<Integer, Integer> likedIds = new HashMap<>();
 
 
@@ -42,7 +48,7 @@ public class Review {
         likedIds.remove(userId);
     }
 
-    public int getUsefulAmount() {
+    public int getUseful() {
         return likedIds.values().stream().reduce(0, Integer::sum);
     }
 

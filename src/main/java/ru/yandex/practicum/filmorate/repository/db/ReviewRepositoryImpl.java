@@ -7,7 +7,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ReviewSaveException;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.repository.ReviewRepository;
 
@@ -41,9 +40,8 @@ public class ReviewRepositoryImpl implements ReviewRepository {
                         "film_id", review.getFilmId())
         );
         review.setId(id);
-        Review savedReview = findById(id)
+        return findById(id)
                 .orElseThrow(() -> new ReviewSaveException("Произошла ошибка при сохранении обзора"));
-        return savedReview;
     }
 
     @Override
@@ -66,21 +64,19 @@ public class ReviewRepositoryImpl implements ReviewRepository {
     public List<Review> findAll() {
         String sqlQuery = "SELECT * FROM review";
         ReviewMapper mapper = new ReviewMapper();
-        List<Review> reviews = jdbcTemplate.query(sqlQuery, mapper);
-        return reviews;
+        return jdbcTemplate.query(sqlQuery, mapper);
     }
 
     @Override
     public List<Review> findReviewsByFilmId(int filmId, int count) {
         String sqlQuery = "SELECT * FROM review WHERE filmId = ? LIMIT ?";
         ReviewMapper mapper = new ReviewMapper();
-        List<Review> reviews = jdbcTemplate.query(
+        return jdbcTemplate.query(
                 sqlQuery,
                 mapper,
                 filmId,
                 count
         );
-        return reviews;
     }
 
     @Override
@@ -97,12 +93,10 @@ public class ReviewRepositoryImpl implements ReviewRepository {
                 review.getContent(),
                 review.isPositive(),
                 review.getUserId(),
-                review.getUserId(),
                 review.getFilmId(),
                 reviewId);
-        Review updatedReview = findById(reviewId)
+        return findById(reviewId)
                 .orElseThrow(() -> new ReviewSaveException("Произошла ошибка при обновлении отзыва"));
-        return updatedReview;
     }
 
 

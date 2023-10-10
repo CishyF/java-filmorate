@@ -2,9 +2,7 @@ package ru.yandex.practicum.filmorate.repository.db;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.ReviewLikeRepository;
@@ -30,11 +28,11 @@ public class ReviewLikeRepositoryImpl implements ReviewLikeRepository {
         }
     }
 
-    private void saveLike(int filmId, int likedUserId, int likeValue) {
-        String sqlQuery = "INSERT INTO review_like (review_id, user_id,like) VALUES (?, ?, ?)";
+    private void saveLike(int reviewId, int likedUserId, int likeValue) {
+        String sqlQuery = "INSERT INTO review_like (review_id, user_id, \"like\") VALUES (?, ?, ?)";
         jdbcTemplate.update(
                 sqlQuery,
-                filmId,
+                reviewId,
                 likedUserId,
                 likeValue
         );
@@ -44,16 +42,16 @@ public class ReviewLikeRepositoryImpl implements ReviewLikeRepository {
     public void loadLikes(List<Review> reviews) {
         String inSql = String.join(", ", Collections.nCopies(reviews.size(), "?"));
         String sqlQuery = String.format("SELECT * FROM review_like as rl " +
-                "LEFT JOIN \"user\" AS u ON fl.user_id = u.id " +
+                "LEFT JOIN \"user\" AS u ON rl.user_id = u.id " +
                 "WHERE u.login IS NOT NULL AND rl.review_id IN (%s)", inSql);
         Map<Integer, Review> reviewById = reviews.stream().collect(toMap(Review::getId, identity()));
         jdbcTemplate.query(
                 sqlQuery,
-                (rs) -> {
-                    final int filmId = rs.getInt("film_id");
+                rs -> {
+                    final int reviewId = rs.getInt("review_id");
                     final int userId = rs.getInt("user_id");
                     final int like = rs.getInt("like");
-                    Review review = reviewById.get(filmId);
+                    Review review = reviewById.get(reviewId);
                     if (review != null) {
                         if (like > 0)
                             review.addLike(userId);
@@ -68,12 +66,10 @@ public class ReviewLikeRepositoryImpl implements ReviewLikeRepository {
     @Override
     public List<Integer> findLikesByReviewId(int reviewId) {
         String sqlQuery = "SELECT user_id FROM review_like WHERE review_id = ?";
-        List<Integer> likes = jdbcTemplate.query(
+        return jdbcTemplate.query(
                 sqlQuery,
                 (rs, rowNum) -> rs.getInt("user_id"),
-                reviewId
-        );
-        return likes;
+                reviewId);
     }
 
     @Override
@@ -98,11 +94,9 @@ public class ReviewLikeRepositoryImpl implements ReviewLikeRepository {
     @Override
     public void deleteLikes(Review review) {
         final int reviewId = review.getId();
-        String sqlQuery = "DELETE FROM review_like WHERE film_id = ?;";
+        String sqlQuery = "DELETE FROM review_like WHERE review_id = ?;";
         jdbcTemplate.update(sqlQuery, reviewId);
     }
-
-
 
 
 }
