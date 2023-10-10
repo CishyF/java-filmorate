@@ -11,12 +11,13 @@ import java.util.*;
 @Data
 @Builder
 public class Review {
+    @JsonProperty("reviewId")
     private int id;
     private String content;
     @JsonProperty("isPositive")
-    private boolean isPositive;
-    private int userId;
-    private int filmId;
+    private Boolean isPositive;
+    private Integer userId;
+    private Integer filmId;
     private int useful;
 
     @JsonIgnore

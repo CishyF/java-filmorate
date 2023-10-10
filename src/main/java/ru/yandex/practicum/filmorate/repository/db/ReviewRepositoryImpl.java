@@ -35,13 +35,14 @@ public class ReviewRepositoryImpl implements ReviewRepository {
         int id = (int) insert.executeAndReturnKey(
                 Map.of(
                         "content", review.getContent(),
-                        "is_positive", review.isPositive(),
+                        "is_positive", review.getIsPositive(),
                         "user_id", review.getUserId(),
                         "film_id", review.getFilmId())
         );
         review.setId(id);
-        return findById(id)
+        Review savedReview = findById(id)
                 .orElseThrow(() -> new ReviewSaveException("Произошла ошибка при сохранении обзора"));
+        return savedReview;
     }
 
     @Override
@@ -88,12 +89,11 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 
     private Review update(Review review) {
         final int reviewId = review.getId();
-        String sqlQuery = "UPDATE review SET content = ?,is_positive = ?,user_id = ?,film_id = ? WHERE review_id = ?";
+        String sqlQuery = "UPDATE review SET content = ?,is_positive = ?,useful=?  WHERE review_id = ?";
         jdbcTemplate.update(sqlQuery,
                 review.getContent(),
-                review.isPositive(),
-                review.getUserId(),
-                review.getFilmId(),
+                review.getIsPositive(),
+                review.getUseful(),
                 reviewId);
         return findById(reviewId)
                 .orElseThrow(() -> new ReviewSaveException("Произошла ошибка при обновлении отзыва"));

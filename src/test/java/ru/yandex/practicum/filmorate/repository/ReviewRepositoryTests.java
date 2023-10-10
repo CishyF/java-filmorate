@@ -77,7 +77,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         Review actualReview = reviewRepository.save(expectedReview);
         assertEquals(1, actualReview.getId());
         assertEquals("This film is so bad", actualReview.getContent());
-        assertEquals(false, actualReview.isPositive());
+        assertEquals(false, actualReview.getIsPositive());
         assertEquals(1, actualReview.getUserId());
         assertEquals(1, actualReview.getFilmId());
         assertEquals(0, actualReview.getUseful());
@@ -100,7 +100,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         assertTrue(optionalReview.isPresent());
         Review actualReview = optionalReview.get();
         assertEquals("This film is so bad", actualReview.getContent());
-        assertEquals(false, actualReview.isPositive());
+        assertEquals(false, actualReview.getIsPositive());
         assertEquals(1, actualReview.getUserId());
         assertEquals(1, actualReview.getFilmId());
         assertEquals(0, actualReview.getUseful());
@@ -111,12 +111,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         Review expectedReview = Review.builder().content("This film is so bad").isPositive(false).userId(1).filmId(1).build();
         reviewRepository.save(expectedReview);
         expectedReview.setContent("This film is so good");
-        expectedReview.setPositive(true);
+        expectedReview.setIsPositive(true);
         reviewRepository.save(expectedReview);
         Optional<Review> optionalReview = reviewRepository.findById(1);
         Review actualReview = optionalReview.get();
         assertEquals("This film is so good", actualReview.getContent());
-        assertEquals(true, actualReview.isPositive());
+        assertEquals(true, actualReview.getIsPositive());
     }
 
     @Test
