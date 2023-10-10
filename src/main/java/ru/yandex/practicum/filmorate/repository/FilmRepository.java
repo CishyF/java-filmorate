@@ -13,5 +13,13 @@ public interface FilmRepository {
 
     List<Film> findAll();
 
+    default List<Film> findTopFilmsByName(String searchQuery) {
+        throw new RuntimeException("Not Implemented");
+    }
+
+    default List<Film> findTopFilmsByDirector(String searchQuery) {
+        throw new RuntimeException("Not Implemented");
+    }
+
     void delete(Film film);
 }
