@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @Data
@@ -13,10 +15,14 @@ import java.util.*;
 public class Review {
     @JsonProperty("reviewId")
     private int id;
+    @NotEmpty
     private String content;
     @JsonProperty("isPositive")
+    @NotNull
     private Boolean isPositive;
+    @NotNull
     private Integer userId;
+    @NotNull
     private Integer filmId;
     private int useful;
 

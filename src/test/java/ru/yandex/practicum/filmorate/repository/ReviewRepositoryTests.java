@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
- class ReviewRepositoryTests {
+class ReviewRepositoryTests {
     private final ReviewRepository reviewRepository;
     private final UserService userService;
     private final FilmService filmService;

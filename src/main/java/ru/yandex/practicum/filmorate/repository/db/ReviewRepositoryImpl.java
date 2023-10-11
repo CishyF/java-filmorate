@@ -70,7 +70,7 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 
     @Override
     public List<Review> findReviewsByFilmId(int filmId, int count) {
-        String sqlQuery = "SELECT * FROM review WHERE filmId = ? LIMIT ?";
+        String sqlQuery = "SELECT * FROM review WHERE film_id = ? LIMIT ?";
         ReviewMapper mapper = new ReviewMapper();
         return jdbcTemplate.query(
                 sqlQuery,

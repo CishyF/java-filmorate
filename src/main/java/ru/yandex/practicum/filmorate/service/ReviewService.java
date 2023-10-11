@@ -15,18 +15,21 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewLikeRepository reviewLikeRepository;
     private final UserService userService;
+    private final FilmService filmService;
 
-    public ReviewService(ReviewRepository reviewRepository, ReviewLikeRepository reviewLikeRepository, UserService userService) {
+    public ReviewService(ReviewRepository reviewRepository, ReviewLikeRepository reviewLikeRepository, UserService userService, FilmService filmService) {
         this.reviewRepository = reviewRepository;
         this.reviewLikeRepository = reviewLikeRepository;
         this.userService = userService;
+        this.filmService = filmService;
     }
 
     public Review create(Review review) {
+        userService.findById(review.getUserId());
+        filmService.findById(review.getFilmId());
         Review savedReview = reviewRepository.save(review);
         List<Review> singletonListForLoad = Collections.singletonList(review);
         reviewLikeRepository.loadLikes(singletonListForLoad);
-
         return savedReview;
     }
 
@@ -42,7 +45,9 @@ public class ReviewService {
     }
 
     public List<Review> findReviewsByFilmId(int filmId, int count) {
-        return reviewRepository.findReviewsByFilmId(filmId, count);
+        List<Review> reviews = reviewRepository.findReviewsByFilmId(filmId, count);
+        reviewLikeRepository.loadLikes(reviews);
+        return reviews;
     }
 
     public List<Review> findAll() {

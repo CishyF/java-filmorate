@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import javax.validation.Valid;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,14 +19,20 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping
-    public List<Review> getReviews(@RequestParam(required = false, defaultValue = "0") int id, @RequestParam(required = false, defaultValue = "10") int count) {
-        log.info("Пришел GET-запрос /reviews с параметром id={} и параметром count={}", id, count);
+    public List<Review> getReviews(
+            @RequestParam(required = false, defaultValue = "0") int filmId,
+            @RequestParam(required = false, defaultValue = "10") int count
+    ) {
+        log.info("Пришел GET-запрос /reviews с параметром id={} и параметром count={}", filmId, count);
         List<Review> reviews;
-        if (id == 0) {
+        if (filmId == 0) {
             reviews = reviewService.findAll().stream().limit(count).collect(Collectors.toList());
         } else {
-            reviews = reviewService.findReviewsByFilmId(id, count);
+            reviews = reviewService.findReviewsByFilmId(filmId, count);
         }
+        reviews = reviews.stream()
+                .sorted(Comparator.comparingInt(Review::getUseful).reversed())
+                .collect(Collectors.toList());
         log.info("Ответ на GET-запрос /reviews с телом={}", reviews);
         return reviews;
     }
