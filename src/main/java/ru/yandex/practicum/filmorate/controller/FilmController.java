@@ -57,7 +57,7 @@ public class FilmController {
             String query,
             @RequestParam
             @Size(min = 1, max = 2,
-                    message = "Допустимые значения: director, title. Либо оба начения через запятую.")
+                    message = "Допустимые значения: director, title. Либо оба значения через запятую.")
             List<String> by) {
         log.info("Пришел GET-запрос /films/search?query={}&by={}", query, by);
 

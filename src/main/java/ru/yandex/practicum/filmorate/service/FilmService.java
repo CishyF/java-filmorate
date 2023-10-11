@@ -70,14 +70,14 @@ public class FilmService {
         for (String b : by) {
             if (!b.equals("director") && !b.equals("title")) {
                 throw new FilmDoesNotExistException(
-                        "Допустимые значения: director, title. Либо оба начения через запятую.");
+                        "Допустимые значения: director, title. Либо оба значения через запятую.");
             }
         }
 
         List<Film> films;
 
         if (by.size() == 1) {
-            if (by.get(0).equals("director")) {
+            if (by.contains("director")) {
                 films = filmRepository.findTopFilmsByDirector(query);
             } else {
                 films = filmRepository.findTopFilmsByName(query);

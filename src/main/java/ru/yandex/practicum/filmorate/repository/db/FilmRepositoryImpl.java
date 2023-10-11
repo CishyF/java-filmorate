@@ -114,7 +114,7 @@ public class FilmRepositoryImpl implements FilmRepository {
                 "GROUP BY f.id " +
                 "ORDER BY COUNT(fl.user_id) DESC;";
 
-        FilmRepositoryImpl.FilmMapper mapper = new FilmRepositoryImpl.FilmMapper();
+        FilmMapper mapper = new FilmRepositoryImpl.FilmMapper();
         List<Film> films = jdbcTemplate.query(
                 sqlQuery,
                 mapper,
@@ -132,12 +132,12 @@ public class FilmRepositoryImpl implements FilmRepository {
                 "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id " +
                 "JOIN film_director AS fd ON f.ID = fd.film_id " +
                 "JOIN director AS d ON fd.director_id = d.id " +
-                "LEFT JOIN film_like AS fl ON f.ID = fl.film_id " +
+                "LEFT JOIN film_like AS fl ON f.id = fl.film_id " +
                 "WHERE d.name LIKE ('%?%') " +
                 "GROUP BY f.id " +
                 "ORDER BY COUNT(fl.user_id) DESC;";
 
-        FilmRepositoryImpl.FilmMapper mapper = new FilmRepositoryImpl.FilmMapper();
+        FilmMapper mapper = new FilmRepositoryImpl.FilmMapper();
         List<Film> films = jdbcTemplate.query(
                 sqlQuery,
                 mapper,
