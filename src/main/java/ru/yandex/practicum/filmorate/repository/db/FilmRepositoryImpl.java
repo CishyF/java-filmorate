@@ -110,7 +110,7 @@ public class FilmRepositoryImpl implements FilmRepository {
                 "FROM film AS f " +
                 "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id " +
                 "LEFT JOIN film_like AS fl ON f.id = fl.film_id " +
-                "WHERE f.name LIKE ('%?%') " +
+                "WHERE LOWER(f.name) LIKE LOWER(?) " +
                 "GROUP BY f.id " +
                 "ORDER BY COUNT(fl.user_id) DESC;";
 
@@ -118,7 +118,7 @@ public class FilmRepositoryImpl implements FilmRepository {
         List<Film> films = jdbcTemplate.query(
                 sqlQuery,
                 mapper,
-                searchQuery
+                "%" + searchQuery + "%"
         );
 
         return films;
@@ -133,7 +133,7 @@ public class FilmRepositoryImpl implements FilmRepository {
                 "JOIN film_director AS fd ON f.ID = fd.film_id " +
                 "JOIN director AS d ON fd.director_id = d.id " +
                 "LEFT JOIN film_like AS fl ON f.id = fl.film_id " +
-                "WHERE d.name LIKE ('%?%') " +
+                "WHERE LOWER(d.name) LIKE LOWER(?) " +
                 "GROUP BY f.id " +
                 "ORDER BY COUNT(fl.user_id) DESC;";
 
@@ -141,7 +141,7 @@ public class FilmRepositoryImpl implements FilmRepository {
         List<Film> films = jdbcTemplate.query(
                 sqlQuery,
                 mapper,
-                searchQuery
+                "%" + searchQuery + "%"
         );
 
         return films;

@@ -97,9 +97,11 @@ public class FilmService {
                     filmRepository.findTopFilmsByName(query).stream()).collect(Collectors.toSet()));
         }
         filmGenreRepository.loadGenres(films);
+        filmDirectorRepository.loadDirectors(films);
         likeRepository.loadLikes(films);
 
-        return films;
+        return films.stream().sorted(Comparator.comparingInt(Film::getAmountOfLikes).reversed())
+                .collect(Collectors.toList());
     }
 
     public Film update(Film film) {
