@@ -33,7 +33,7 @@ public class EventRepositoryImpl implements EventRepository {
         SimpleJdbcInsert insert = new SimpleJdbcInsert(jdbcTemplate)
                 .withSchemaName("public")
                 .withTableName("event")
-                .usingColumns("event_id", "timestamp", "user_id", "event_type", "operation", "entity_id")
+                .usingColumns("timestamp", "user_id", "event_type", "operation", "entity_id")
                 .usingGeneratedKeyColumns("event_id");
         insert.compile();
 
@@ -103,7 +103,7 @@ public class EventRepositoryImpl implements EventRepository {
 
     private Event update(Event event) {
         final int eventId = event.getId();
-        String sqlQuery = "UPDATE event SET timestamp = ?,user_id = ?,event_type = ?,operation = ?, entity_id = ? WHERE eventId = ?";
+        String sqlQuery = "UPDATE event SET timestamp = ?,user_id = ?,event_type = ?,operation = ?, entity_id = ? WHERE event_id = ?";
         jdbcTemplate.update(
                 sqlQuery,
                 event.getTimestamp(),

@@ -9,6 +9,7 @@ import java.time.Instant;
 @Data
 @Builder
 public class Event {
+    @JsonProperty("eventId")
     private int id;
     private Long timestamp;
     private int userId;

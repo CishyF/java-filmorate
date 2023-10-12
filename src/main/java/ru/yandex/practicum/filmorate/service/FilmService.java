@@ -106,14 +106,14 @@ public class FilmService {
         User user = userService.findById(userId);
 
         film.addLike(user);
+      likeRepository.deleteLikes(film);
+      likeRepository.saveLikes(film);
         eventRepository.save(Event.builder()
                 .timestamp(Instant.now().toEpochMilli())
                 .userId(userId)
                 .type(EventType.LIKE)
                 .operation(EventOperation.ADD)
                 .entityId(filmId).build());
-        likeRepository.deleteLikes(film);
-        likeRepository.saveLikes(film);
         return film;
     }
 
