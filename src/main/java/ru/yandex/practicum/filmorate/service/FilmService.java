@@ -107,7 +107,7 @@ public class FilmService {
 
         film.addLike(user);
         eventRepository.save(Event.builder()
-                .timestamp(Instant.now())
+                .timestamp(Instant.now().toEpochMilli())
                 .userId(userId)
                 .type(EventType.LIKE)
                 .operation(EventOperation.ADD)
@@ -124,7 +124,7 @@ public class FilmService {
 
         likeRepository.deleteLike(film, user);
         eventRepository.save(Event.builder()
-                .timestamp(Instant.now())
+                .timestamp(Instant.now().toEpochMilli())
                 .userId(userId)
                 .type(EventType.LIKE)
                 .operation(EventOperation.REMOVE)

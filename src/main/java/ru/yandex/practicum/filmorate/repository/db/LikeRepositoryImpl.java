@@ -3,12 +3,11 @@ package ru.yandex.practicum.filmorate.repository.db;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.repository.EventRepository;
 import ru.yandex.practicum.filmorate.repository.LikeRepository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -41,9 +40,9 @@ public class LikeRepositoryImpl implements LikeRepository {
         );
         eventRepository.save(
                 Event.builder()
-                        .dateTime(LocalDateTime.now())
-                        .userId(likedUserId).eventType("LIKE")
-                        .operation("ADD")
+                        .timestamp(Instant.now().toEpochMilli())
+                        .userId(likedUserId).type(EventType.LIKE)
+                        .operation(EventOperation.ADD)
                         .entityId(filmId).build()
         );
     }
@@ -92,9 +91,9 @@ public class LikeRepositoryImpl implements LikeRepository {
         );
         eventRepository.save(
                 Event.builder()
-                        .dateTime(LocalDateTime.now())
-                        .userId(userId).eventType("LIKE")
-                        .operation("REMOVE")
+                        .timestamp(Instant.now().toEpochMilli())
+                        .userId(userId).type(EventType.LIKE)
+                        .operation(EventOperation.REMOVE)
                         .entityId(filmId).build()
         );
     }

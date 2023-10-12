@@ -8,13 +8,13 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.FilmSaveException;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventOperation;
+import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.repository.EventRepository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,9 +38,9 @@ public class EventRepositoryImpl implements EventRepository {
         insert.compile();
 
         int id = (int) insert.executeAndReturnKey(Map.of(
-                "timestamp", event.getDateTime().toInstant(ZoneOffset.UTC).toEpochMilli(),
+                "timestamp", Instant.now().toEpochMilli(),
                 "user_id", event.getUserId(),
-                "event_type", event.getEventType(),
+                "event_type", event.getType(),
                 "operation", event.getOperation(),
                 "entity_id", event.getEntityId()
         ));
@@ -106,9 +106,9 @@ public class EventRepositoryImpl implements EventRepository {
         String sqlQuery = "UPDATE event SET timestamp = ?,user_id = ?,event_type = ?,operation = ?, entity_id = ? WHERE eventId = ?";
         jdbcTemplate.update(
                 sqlQuery,
-                event.getDateTime().toInstant(ZoneOffset.UTC),
+                event.getTimestamp(),
                 event.getUserId(),
-                event.getEventType(),
+                event.getType(),
                 event.getOperation(),
                 event.getEntityId(),
                 eventId
@@ -123,10 +123,10 @@ public class EventRepositoryImpl implements EventRepository {
         public Event mapRow(ResultSet rs, int rowNum) throws SQLException {
             return Event.builder()
                     .id(rs.getInt("event_id"))
-                    .dateTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(rs.getLong("timestamp")), ZoneOffset.UTC))
+                    .timestamp(rs.getLong("timestamp"))
                     .userId(rs.getInt("user_id"))
-                    .eventType(rs.getString("event_type"))
-                    .operation(rs.getString("operation"))
+                    .type(EventType.valueOf(rs.getString("event_type")))
+                    .operation(EventOperation.valueOf(rs.getString("operation")))
                     .entityId(rs.getInt("entity_id")).build();
         }
     }

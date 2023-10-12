@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,8 +10,9 @@ import java.time.Instant;
 @Builder
 public class Event {
     private int id;
-    private Instant timestamp;
+    private Long timestamp;
     private int userId;
+    @JsonProperty("eventType")
     private EventType type;
     private EventOperation operation;
     private int entityId;
