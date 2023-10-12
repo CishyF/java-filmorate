@@ -50,6 +50,27 @@ public class FilmController {
         return popularFilms;
     }
 
+    @GetMapping("/director/{directorId}")
+    public List<Film> getTopFilmsOfDirectorByLikesOrReleaseYear(
+            @PathVariable int directorId,
+            @RequestParam(value = "sortBy", defaultValue = "") @NotBlank String sortBy
+    ) {
+        log.info("Пришел GET-запрос /films/director/{directorId={}}?sortBy={}", directorId, sortBy);
+
+        List<Film> directorTopFilms = Collections.emptyList();
+        switch (sortBy.toLowerCase()) {
+            case "likes":
+                directorTopFilms = filmService.getDirectorFilmsByLikes(directorId);
+                break;
+            case "year":
+                directorTopFilms = filmService.getDirectorFilmsByYear(directorId);
+        }
+        log.info("Ответ на GET-запрос /films/director/{directorId={}}?sortBy={} с телом={}",
+                directorId, sortBy, directorTopFilms
+        );
+        return directorTopFilms;
+    }
+
     @GetMapping("/search")
     public List<Film> searchFilms(
             @RequestParam
