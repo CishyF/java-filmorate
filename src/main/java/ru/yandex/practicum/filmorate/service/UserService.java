@@ -15,7 +15,9 @@ import ru.yandex.practicum.filmorate.repository.LikeRepository;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -110,14 +112,7 @@ public class UserService {
     }
 
     public List<Event> getUserFeed(int userId) {
-      /*  return getFriendsOfUser(userId)
-                .stream()
-                .map(friend -> eventRepository.findByUserId(friend.getId()))
-                .flatMap(Collection::stream)
-                .sorted(Comparator.comparingLong(Event::getTimestamp).reversed())
-                .collect(Collectors.toList());
-
-       */
+        findById(userId);
         List<Event> events = eventRepository.findByUserId(userId);
         return events;
 

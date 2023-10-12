@@ -27,6 +27,7 @@ public class ReviewService {
         this.eventRepository = eventRepository;
     }
 
+
     public Review create(Review review) {
         userService.findById(review.getUserId());
         filmService.findById(review.getFilmId());
@@ -40,6 +41,7 @@ public class ReviewService {
                 .type(EventType.REVIEW)
                 .operation(EventOperation.ADD)
                 .entityId(review.getId()).build());
+
         return savedReview;
     }
 
@@ -68,15 +70,22 @@ public class ReviewService {
 
     public Review update(Review review) {
         final int reviewId = review.getId();
-        reviewRepository.findById(reviewId)
+        Review updatedReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewDoesNotExistException("Попытка обновить несуществующий обзор"));
+        userService.findById(review.getUserId());
+        filmService.findById(review.getFilmId());
+        updatedReview.setContent(review.getContent());
+        updatedReview.setIsPositive(review.getIsPositive());
         eventRepository.save(Event.builder()
                 .timestamp(Instant.now().toEpochMilli())
-                .userId(review.getUserId())
+                .userId(updatedReview.getUserId())
                 .type(EventType.REVIEW)
                 .operation(EventOperation.UPDATE)
-                .entityId(review.getId()).build());
-        return create(review);
+                .entityId(updatedReview.getId()).build());
+        Review savedReview = reviewRepository.save(updatedReview);
+        List<Review> singletonListForLoad = Collections.singletonList(review);
+        reviewLikeRepository.loadLikes(singletonListForLoad);
+        return savedReview;
     }
 
     public Review addLikeToReview(int filmId, int userId, boolean like) {

@@ -90,11 +90,10 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 
     private Review update(Review review) {
         final int reviewId = review.getId();
-        String sqlQuery = "UPDATE review SET content = ?,is_positive = ?,useful=?  WHERE review_id = ?";
+        String sqlQuery = "UPDATE review SET content = ?,is_positive = ?  WHERE review_id = ?";
         jdbcTemplate.update(sqlQuery,
                 review.getContent(),
                 review.getIsPositive(),
-                review.getUseful(),
                 reviewId);
         return findById(reviewId)
                 .orElseThrow(() -> new ReviewSaveException("Произошла ошибка при обновлении отзыва"));
