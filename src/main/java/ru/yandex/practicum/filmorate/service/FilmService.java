@@ -3,22 +3,26 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.DirectorDoesNotExistException;
 import ru.yandex.practicum.filmorate.exception.FilmDoesNotExistException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.exception.GenreDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.repository.FilmGenreRepository;
-import ru.yandex.practicum.filmorate.repository.FilmRepository;
-import ru.yandex.practicum.filmorate.repository.LikeRepository;
+import ru.yandex.practicum.filmorate.repository.*;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
 
     private final FilmRepository filmRepository;
     private final FilmGenreRepository filmGenreRepository;
+    private final FilmDirectorRepository filmDirectorRepository;
+    private final DirectorRepository directorRepository;
     private final LikeRepository likeRepository;
     private final UserService userService;
 
@@ -26,11 +30,15 @@ public class FilmService {
     public FilmService(
             @Qualifier("filmRepositoryImpl") FilmRepository filmRepository,
             FilmGenreRepository filmGenreRepository,
+            FilmDirectorRepository filmDirectorRepository,
+            DirectorRepository directorRepository,
             LikeRepository likeRepository,
             UserService userService
     ) {
         this.filmRepository = filmRepository;
         this.filmGenreRepository = filmGenreRepository;
+        this.filmDirectorRepository = filmDirectorRepository;
+        this.directorRepository = directorRepository;
         this.likeRepository = likeRepository;
         this.userService = userService;
     }
@@ -38,9 +46,11 @@ public class FilmService {
     public Film create(Film film) {
         Film savedFilm = filmRepository.save(film);
         filmGenreRepository.saveGenres(film);
+        filmDirectorRepository.saveDirectors(film);
 
         List<Film> singletonListForLoad = Collections.singletonList(savedFilm);
         filmGenreRepository.loadGenres(singletonListForLoad);
+        filmDirectorRepository.loadDirectors(singletonListForLoad);
         likeRepository.loadLikes(singletonListForLoad);
 
         return savedFilm;
@@ -52,6 +62,7 @@ public class FilmService {
 
         List<Film> singletonListForLoad = Collections.singletonList(film);
         filmGenreRepository.loadGenres(singletonListForLoad);
+        filmDirectorRepository.loadDirectors(singletonListForLoad);
         likeRepository.loadLikes(singletonListForLoad);
 
         return film;
@@ -60,6 +71,7 @@ public class FilmService {
     public List<Film> findAll() {
         List<Film> films = filmRepository.findAll();
         filmGenreRepository.loadGenres(films);
+        filmDirectorRepository.loadDirectors(films);
         likeRepository.loadLikes(films);
         return films;
     }
@@ -69,6 +81,7 @@ public class FilmService {
         filmRepository.findById(filmId)
                 .orElseThrow(() -> new FilmDoesNotExistException("Попытка обновить несуществующий фильм"));
         filmGenreRepository.deleteGenres(film);
+        filmDirectorRepository.deleteDirectors(film);
         return create(film);
     }
 
@@ -78,6 +91,7 @@ public class FilmService {
 
         List<Film> singletonListForLoad = Collections.singletonList(film);
         filmGenreRepository.loadGenres(singletonListForLoad);
+        filmDirectorRepository.loadDirectors(singletonListForLoad);
         likeRepository.loadLikes(singletonListForLoad);
 
         User user = userService.findById(userId);
@@ -121,9 +135,33 @@ public class FilmService {
         return films;
     }
 
+     public List<Film> getDirectorFilmsByLikes(int directorId) {
+        return getDirectorFilms(directorId).stream()
+                .sorted(Comparator.<Film>comparingInt(film -> film.getLikedIds().size()).reversed())
+                .collect(Collectors.toList());
+     }
+
+     public List<Film> getDirectorFilmsByYear(int directorId) {
+        return getDirectorFilms(directorId).stream()
+                .sorted(Comparator.comparing(Film::getReleaseDate))
+                .collect(Collectors.toList());
+     }
+
+     public List<Film> getDirectorFilms(int directorId) {
+        directorRepository.findById(directorId)
+            .orElseThrow(() -> new DirectorDoesNotExistException("Попытка получить фильмы несуществующего режиссера"));
+        return findAll().stream()
+                .filter(film -> film.getDirectors()
+                                        .stream()
+                                        .map(Director::getId)
+                                        .anyMatch(id -> id == directorId)
+                ).collect(Collectors.toList());
+     }
+
     public void delete(Film film) {
         filmRepository.delete(film);
         filmGenreRepository.deleteGenres(film);
+        filmDirectorRepository.deleteDirectors(film);
         likeRepository.deleteLikes(film);
     }
 }
