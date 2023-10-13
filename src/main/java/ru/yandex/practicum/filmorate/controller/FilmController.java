@@ -128,6 +128,14 @@ public class FilmController {
         return likedFilm;
     }
 
+    @DeleteMapping("/{filmId}")
+    public void deleteFilmById(@PathVariable("filmId") int filmId) {
+        log.info("Пришел DELETE-запрос /films/filmId={}", filmId);
+
+        filmService.deleteFilmById(filmId);
+        log.info("Фильм id={} удален", filmId);
+    }
+
     @DeleteMapping("/{id}/like/{userId}")
     public void removeLikeFromFilm(@PathVariable("id") int filmId, @PathVariable int userId) {
         log.info("Пришел DELETE-запрос /films/{id={}}/like/{userId={}}", filmId, userId);

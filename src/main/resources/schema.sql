@@ -1,15 +1,14 @@
 DROP TABLE IF EXISTS rating_mpa CASCADE;
-DROP TABLE IF EXISTS film CASCADE;
 DROP TABLE IF EXISTS genre CASCADE;
 DROP TABLE IF EXISTS film_genre CASCADE;
-DROP TABLE IF EXISTS "user" CASCADE;
 DROP TABLE IF EXISTS film_like CASCADE;
 DROP TABLE IF EXISTS statuses CASCADE;
 DROP TABLE IF EXISTS friendship CASCADE;
 DROP TABLE IF EXISTS review CASCADE;
 DROP TABLE IF EXISTS review_like CASCADE;
 DROP TABLE IF EXISTS event CASCADE;
-
+DROP TABLE IF EXISTS film CASCADE;
+DROP TABLE IF EXISTS "user" CASCADE;
 
 CREATE TABLE IF NOT EXISTS genre (
     id integer PRIMARY KEY,
@@ -80,7 +79,7 @@ CREATE TABLE IF NOT EXISTS review(
 
 CREATE TABLE IF NOT EXISTS review_like(
     review_id integer NOT NULL REFERENCES review(review_id),
-    user_id integer NOT NULL REFERENCES "user"(id),
+    user_id integer NOT NULL,
     "like" integer NOT NULL,
     UNIQUE(review_id,user_id),
     CONSTRAINT fk_like_review CHECK("like" IN(-1,1))

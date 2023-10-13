@@ -111,4 +111,13 @@ public class UserController {
         userService.removeFriendOfUser(id, friendId);
         log.info("Пользователи userId={} и friendId={} успешно удалены из друзей", id, friendId);
     }
+
+    @DeleteMapping("/{userId}")
+    public void deleteUserById(@PathVariable int userId) {
+        log.info("Пришел DELETE-запрос /users/{userId}", userId);
+
+        userService.deleteUserById(userId);
+        log.info("Пользователь userId={} успешно удален", userId);
+    }
+
 }

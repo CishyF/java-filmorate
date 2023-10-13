@@ -162,6 +162,11 @@ public class UserService {
         return Optional.of(findById(userWithMaxFilmMatchesCount));
     }
 
+    public void deleteUserById(int userId) {
+        User user = findById(userId);
+        delete(user);
+    }
+
     public void delete(User user) {
         likeRepository.deleteLikes(user);
         friendRepository.deleteFriends(user);

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.yandex.practicum.filmorate.exception.FilmDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.RatingMPA;
@@ -113,6 +114,27 @@ public class FilmRepositoryTests {
         assertEquals(savedFilm2, actualFilm2);
         assertEquals(expectedId1, actualFilm1.getId());
         assertEquals(expectedId2, actualFilm2.getId());
+    }
+
+    @Test
+    public void shouldDeleteFilmById() {
+        Film film2 = Film.builder()
+            .name("vfdvdfvd")
+            .description("dadidacing")
+            .releaseDate(LocalDate.now())
+            .duration(100)
+            .mpa(new RatingMPA(1, "G"))
+            .build();
+        Film savedFilm2 = filmRepository.save(film2);
+
+        expectedId.incrementAndGet();
+        expectedId.incrementAndGet();
+
+        filmService.deleteFilmById(savedFilm2.getId());
+
+        FilmDoesNotExistException exc = assertThrows(FilmDoesNotExistException.class,
+            () -> filmService.deleteFilmById(savedFilm2.getId()));
+        assertEquals("Попытка получить несуществующий фильм", exc.getMessage());
     }
 
     @Test

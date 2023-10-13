@@ -252,6 +252,11 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
+    public void deleteFilmById(int filmId) {
+        Film film = findById(filmId);
+        delete(film);
+    }
+
     public void delete(Film film) {
         filmGenreRepository.deleteGenres(film);
         filmDirectorRepository.deleteDirectors(film);
