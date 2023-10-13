@@ -83,6 +83,18 @@ public class FilmService {
         return films;
     }
 
+        public List<Film> getCommonFilms(int userId, int friendId) {
+            userService.findById(userId);
+            userService.findById(friendId);
+
+            List<Film> films = filmRepository.foundCommonFilms(userId, friendId);
+            filmGenreRepository.loadGenres(films);
+            filmDirectorRepository.loadDirectors(films);
+            likeRepository.loadLikes(films);
+
+            return films;
+            }
+
     public List<Film> searchFilms(String query, List<String> by) {
         for (String b : by) {
             if (!b.equals("director") && !b.equals("title")) {
