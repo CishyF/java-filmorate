@@ -9,11 +9,14 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.exception.GenreDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.repository.*;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +28,7 @@ public class FilmService {
     private final DirectorRepository directorRepository;
     private final LikeRepository likeRepository;
     private final UserService userService;
+    private final EventRepository eventRepository;
 
     @Autowired
     public FilmService(
@@ -32,6 +36,7 @@ public class FilmService {
             FilmGenreRepository filmGenreRepository,
             FilmDirectorRepository filmDirectorRepository,
             DirectorRepository directorRepository,
+            EventRepository eventRepository,
             LikeRepository likeRepository,
             UserService userService
     ) {
@@ -39,6 +44,7 @@ public class FilmService {
         this.filmGenreRepository = filmGenreRepository;
         this.filmDirectorRepository = filmDirectorRepository;
         this.directorRepository = directorRepository;
+        this.eventRepository = eventRepository;
         this.likeRepository = likeRepository;
         this.userService = userService;
     }
@@ -99,6 +105,12 @@ public class FilmService {
         film.addLike(user);
         likeRepository.deleteLikes(film);
         likeRepository.saveLikes(film);
+        eventRepository.save(Event.builder()
+                .timestamp(Instant.now().toEpochMilli())
+                .userId(userId)
+                .type(EventType.LIKE)
+                .operation(EventOperation.ADD)
+                .entityId(filmId).build());
         return film;
     }
 
@@ -108,6 +120,12 @@ public class FilmService {
         User user = userService.findById(userId);
 
         likeRepository.deleteLike(film, user);
+        eventRepository.save(Event.builder()
+                .timestamp(Instant.now().toEpochMilli())
+                .userId(userId)
+                .type(EventType.LIKE)
+                .operation(EventOperation.REMOVE)
+                .entityId(filmId).build());
     }
 
     public List<Film> findTopFilmsByLikesOrGenreAndYear(int genreId, int year, int count) {
@@ -158,6 +176,37 @@ public class FilmService {
                                         .anyMatch(id -> id == directorId)
                 ).collect(Collectors.toList());
      }
+
+    public List<Film> getRecommendedFilms(int id) {
+        List<Film> films = findAll();
+        User user = userService.findById(id);
+
+        Optional<User> userWithMaxFilmMatchesCount = userService.getUserWithMaxFilmMatchesCount(films, user);
+        if (userWithMaxFilmMatchesCount.isEmpty()) {
+            return Collections.emptyList();
+        }
+        User other = userWithMaxFilmMatchesCount.get();
+
+        List<Film> newRecommendedFilmsForUser = getMismatchedFilmsOfUserWithOther(user, other);
+        return newRecommendedFilmsForUser;
+    }
+
+    private List<Film> getMismatchedFilmsOfUserWithOther(User user, User other) {
+        final int userId = user.getId();
+        final int otherId = other.getId();
+
+        List<Film> otherFilms = getFilmsOfUser(otherId);
+        List<Film> userFilms = getFilmsOfUser(userId);
+        otherFilms.removeIf(userFilms::contains);
+
+        return otherFilms;
+    }
+
+    public List<Film> getFilmsOfUser(int userId) {
+        return findAll().stream()
+                .filter(film -> film.getLikedIds().contains(userId))
+                .collect(Collectors.toList());
+    }
 
     public void delete(Film film) {
         filmRepository.delete(film);

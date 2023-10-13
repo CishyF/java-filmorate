@@ -5,14 +5,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserDoesNotExistException;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventOperation;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.repository.EventRepository;
 import ru.yandex.practicum.filmorate.repository.FriendRepository;
 import ru.yandex.practicum.filmorate.repository.LikeRepository;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.time.Instant;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -22,16 +26,19 @@ public class UserService {
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
     private final LikeRepository likeRepository;
+    private final EventRepository eventRepository;
 
     @Autowired
     public UserService(
             @Qualifier("userRepositoryImpl") UserRepository userRepository,
             FriendRepository friendRepository,
-            LikeRepository likeRepository
+            LikeRepository likeRepository,
+            EventRepository eventRepository
     ) {
         this.userRepository = userRepository;
         this.friendRepository = friendRepository;
         this.likeRepository = likeRepository;
+        this.eventRepository = eventRepository;
     }
 
     public User create(User user) {
@@ -77,6 +84,12 @@ public class UserService {
 
         friendRepository.deleteFriends(user);
         friendRepository.saveFriends(user);
+        eventRepository.save(Event.builder()
+                .timestamp(Instant.now().toEpochMilli())
+                .userId(userId)
+                .type(EventType.FRIEND)
+                .operation(EventOperation.ADD)
+                .entityId(friendId).build());
         return user;
     }
 
@@ -88,6 +101,20 @@ public class UserService {
 
         user.removeFriend(friend);
         friendRepository.deleteFriend(user, friend);
+
+        eventRepository.save(Event.builder()
+                .timestamp(Instant.now().toEpochMilli())
+                .userId(userId)
+                .type(EventType.FRIEND)
+                .operation(EventOperation.REMOVE)
+                .entityId(friendId).build());
+    }
+
+    public List<Event> getUserFeed(int userId) {
+        findById(userId);
+        List<Event> events = eventRepository.findByUserId(userId);
+        return events;
+
     }
 
     public List<User> getFriendsOfUser(int id) {
@@ -108,6 +135,31 @@ public class UserService {
 
         friends1.removeIf(friend -> !friends2.contains(friend));
         return friends1;
+    }
+
+    public Optional<User> getUserWithMaxFilmMatchesCount(List<Film> films, User user) {
+        final int userId = user.getId();
+
+        Map<Integer, Integer> countIntersectionsOfLikedFilmsByUserId = new HashMap<>();
+        films.stream()
+                .filter(film -> film.getLikedIds().contains(userId))
+                .flatMap(film -> film.getLikedIds().stream())
+                .filter(likedIds -> likedIds != userId)
+                .forEach(uId -> countIntersectionsOfLikedFilmsByUserId
+                        .compute(uId, (id, count) -> (count == null) ? 0 : count + 1)
+                );
+
+        Map.Entry<Integer, Integer> maxLikeIntersectionsCountEntry =
+                countIntersectionsOfLikedFilmsByUserId.entrySet()
+                        .stream()
+                        .max(Comparator.comparingInt(Map.Entry::getValue))
+                        .orElse(null);
+        if (maxLikeIntersectionsCountEntry == null) {
+            return Optional.empty();
+        }
+        final int userWithMaxFilmMatchesCount = maxLikeIntersectionsCountEntry.getKey();
+
+        return Optional.of(findById(userWithMaxFilmMatchesCount));
     }
 
     public void delete(User user) {

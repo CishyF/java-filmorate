@@ -8,7 +8,8 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @RestController
