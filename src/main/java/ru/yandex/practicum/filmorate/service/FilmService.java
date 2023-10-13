@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class FilmService {
@@ -80,6 +81,34 @@ public class FilmService {
         filmDirectorRepository.loadDirectors(films);
         likeRepository.loadLikes(films);
         return films;
+    }
+
+    public List<Film> searchFilms(String query, List<String> by) {
+        for (String b : by) {
+            if (!b.equals("director") && !b.equals("title")) {
+                throw new FilmDoesNotExistException(
+                        "Допустимые значения: director, title. Либо оба значения через запятую.");
+            }
+        }
+
+        List<Film> films;
+
+        if (by.size() == 1) {
+            if (by.contains("director")) {
+                films = filmRepository.findTopFilmsByDirector(query);
+            } else {
+                films = filmRepository.findTopFilmsByName(query);
+            }
+        } else {
+            films = List.copyOf(Stream.concat(filmRepository.findTopFilmsByDirector(query).stream(),
+                    filmRepository.findTopFilmsByName(query).stream()).collect(Collectors.toSet()));
+        }
+        filmGenreRepository.loadGenres(films);
+        filmDirectorRepository.loadDirectors(films);
+        likeRepository.loadLikes(films);
+
+        return films.stream().sorted(Comparator.comparingInt(Film::getAmountOfLikes).reversed())
+                .collect(Collectors.toList());
     }
 
     public Film update(Film film) {

@@ -2,16 +2,18 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import java.util.Collections;
-import java.util.List;
+import javax.validation.constraints.Size;
+import java.util.*;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/films")
 @RequiredArgsConstructor
@@ -70,6 +72,22 @@ public class FilmController {
                 directorId, sortBy, directorTopFilms
         );
         return directorTopFilms;
+    }
+
+    @GetMapping("/search")
+    public List<Film> searchFilms(
+            @RequestParam
+            @NotBlank
+            String query,
+            @RequestParam
+            @Size(min = 1, max = 2,
+                    message = "Допустимые значения: director, title. Либо оба значения через запятую.")
+            List<String> by) {
+        log.info("Пришел GET-запрос /films/search?query={}&by={}", query, by);
+
+        List<Film> foundFilms = filmService.searchFilms(query, by);
+        log.info("Ответ на GET-запрос /films/search?query={}&by={} с телом={}", query, by, foundFilms);
+        return foundFilms;
     }
 
     @PostMapping
