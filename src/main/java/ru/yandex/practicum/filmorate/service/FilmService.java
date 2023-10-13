@@ -92,6 +92,9 @@ public class FilmService {
             filmDirectorRepository.loadDirectors(films);
             likeRepository.loadLikes(films);
 
+            films = films.stream().sorted(Comparator.comparingInt(Film::getAmountOfLikes).reversed())
+                .collect(Collectors.toList());
+
             return films;
             }
 
