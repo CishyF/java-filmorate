@@ -40,13 +40,16 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getTopFilmsByLikes(
-        @RequestParam(value = "count", defaultValue = "10", required = false) int count
+    public List<Film> getTopFilmsByLikesOrGenreAndYear(
+            @RequestParam(value = "count", defaultValue = "10", required = false) int count,
+            @RequestParam(value = "genreId", defaultValue = "0", required = false) int genreId,
+            @RequestParam(value = "year", defaultValue = "0", required = false) int year
     ) {
-        log.info("Пришел GET-запрос /films/popular?count={}", count);
+        log.info("Пришел GET-запрос /films/popular?count={}&genreId={}&year={}", count, genreId, year);
 
-        List<Film> popularFilms = filmService.getFilmsByLikes(count);
-        log.info("Ответ на GET-запрос /films/popular?count={} с телом={}", count, popularFilms);
+        List<Film> popularFilms = filmService.findTopFilmsByLikesOrGenreAndYear(genreId, year, count);
+        log.info("Ответ на GET-запрос /films/popular?count={}&genreId={}&year={} с телом={}",
+                count, genreId, year, popularFilms);
         return popularFilms;
     }
 
