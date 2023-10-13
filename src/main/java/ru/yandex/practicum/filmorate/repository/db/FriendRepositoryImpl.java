@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.repository.EventRepository;
 import ru.yandex.practicum.filmorate.repository.FriendRepository;
 
 import java.util.Collections;
@@ -18,6 +19,8 @@ import static java.util.stream.Collectors.toMap;
 public class FriendRepositoryImpl implements FriendRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final EventRepository eventRepository;
+
 
     @Override
     public void saveFriends(User user) {

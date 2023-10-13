@@ -5,11 +5,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.DirectorDoesNotExistException;
 import ru.yandex.practicum.filmorate.exception.FilmDoesNotExistException;
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.repository.*;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -24,6 +23,7 @@ public class FilmService {
     private final DirectorRepository directorRepository;
     private final LikeRepository likeRepository;
     private final UserService userService;
+    private final EventRepository eventRepository;
 
     @Autowired
     public FilmService(
@@ -31,6 +31,7 @@ public class FilmService {
             FilmGenreRepository filmGenreRepository,
             FilmDirectorRepository filmDirectorRepository,
             DirectorRepository directorRepository,
+            EventRepository eventRepository,
             LikeRepository likeRepository,
             UserService userService
     ) {
@@ -38,8 +39,10 @@ public class FilmService {
         this.filmGenreRepository = filmGenreRepository;
         this.filmDirectorRepository = filmDirectorRepository;
         this.directorRepository = directorRepository;
+        this.eventRepository = eventRepository;
         this.likeRepository = likeRepository;
         this.userService = userService;
+
     }
 
     public Film create(Film film) {
@@ -96,8 +99,14 @@ public class FilmService {
         User user = userService.findById(userId);
 
         film.addLike(user);
-        likeRepository.deleteLikes(film);
-        likeRepository.saveLikes(film);
+      likeRepository.deleteLikes(film);
+      likeRepository.saveLikes(film);
+        eventRepository.save(Event.builder()
+                .timestamp(Instant.now().toEpochMilli())
+                .userId(userId)
+                .type(EventType.LIKE)
+                .operation(EventOperation.ADD)
+                .entityId(filmId).build());
         return film;
     }
 
@@ -107,6 +116,12 @@ public class FilmService {
         User user = userService.findById(userId);
 
         likeRepository.deleteLike(film, user);
+        eventRepository.save(Event.builder()
+                .timestamp(Instant.now().toEpochMilli())
+                .userId(userId)
+                .type(EventType.LIKE)
+                .operation(EventOperation.REMOVE)
+                .entityId(filmId).build());
     }
 
     public List<Film> getFilmsByLikes(int count) {
