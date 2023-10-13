@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ErrorHandler {
 
     @ExceptionHandler({
-        FilmDoesNotExistException.class, UserDoesNotExistException.class, DataAccessException.class
+            FilmDoesNotExistException.class, UserDoesNotExistException.class,
+            DirectorDoesNotExistException.class, RatingDoesNotExistException.class,
+            GenreDoesNotExistException.class, ReviewDoesNotExistException.class, DataAccessException.class
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleDoesNotExistExceptions(RuntimeException e) {

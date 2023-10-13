@@ -2,14 +2,18 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.*;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/films")
 @RequiredArgsConstructor
@@ -36,14 +40,54 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getTopFilmsByLikes(
-        @RequestParam(value = "count", defaultValue = "10", required = false) int count
+    public List<Film> getTopFilmsByLikesOrGenreAndYear(
+            @RequestParam(value = "count", defaultValue = "10", required = false) int count,
+            @RequestParam(value = "genreId", defaultValue = "0", required = false) int genreId,
+            @RequestParam(value = "year", defaultValue = "0", required = false) int year
     ) {
-        log.info("Пришел GET-запрос /films/popular?count={}", count);
+        log.info("Пришел GET-запрос /films/popular?count={}&genreId={}&year={}", count, genreId, year);
 
-        List<Film> popularFilms = filmService.getFilmsByLikes(count);
-        log.info("Ответ на GET-запрос /films/popular?count={} с телом={}", count, popularFilms);
+        List<Film> popularFilms = filmService.findTopFilmsByLikesOrGenreAndYear(genreId, year, count);
+        log.info("Ответ на GET-запрос /films/popular?count={}&genreId={}&year={} с телом={}",
+                count, genreId, year, popularFilms);
         return popularFilms;
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getTopFilmsOfDirectorByLikesOrReleaseYear(
+            @PathVariable int directorId,
+            @RequestParam(value = "sortBy", defaultValue = "") @NotBlank String sortBy
+    ) {
+        log.info("Пришел GET-запрос /films/director/{directorId={}}?sortBy={}", directorId, sortBy);
+
+        List<Film> directorTopFilms = Collections.emptyList();
+        switch (sortBy.toLowerCase()) {
+            case "likes":
+                directorTopFilms = filmService.getDirectorFilmsByLikes(directorId);
+                break;
+            case "year":
+                directorTopFilms = filmService.getDirectorFilmsByYear(directorId);
+        }
+        log.info("Ответ на GET-запрос /films/director/{directorId={}}?sortBy={} с телом={}",
+                directorId, sortBy, directorTopFilms
+        );
+        return directorTopFilms;
+    }
+
+    @GetMapping("/search")
+    public List<Film> searchFilms(
+            @RequestParam
+            @NotBlank
+            String query,
+            @RequestParam
+            @Size(min = 1, max = 2,
+                    message = "Допустимые значения: director, title. Либо оба значения через запятую.")
+            List<String> by) {
+        log.info("Пришел GET-запрос /films/search?query={}&by={}", query, by);
+
+        List<Film> foundFilms = filmService.searchFilms(query, by);
+        log.info("Ответ на GET-запрос /films/search?query={}&by={} с телом={}", query, by, foundFilms);
+        return foundFilms;
     }
 
     @PostMapping
