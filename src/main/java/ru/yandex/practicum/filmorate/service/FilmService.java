@@ -5,6 +5,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.DirectorDoesNotExistException;
 import ru.yandex.practicum.filmorate.exception.FilmDoesNotExistException;
+import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.exception.GenreDoesNotExistException;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.repository.*;
 
@@ -124,10 +128,30 @@ public class FilmService {
                 .entityId(filmId).build());
     }
 
-    public List<Film> getFilmsByLikes(int count) {
-        return findAll().stream()
-                .sorted(Comparator.comparingInt(Film::getAmountOfLikes).reversed())
-                .limit(count).collect(Collectors.toList());
+    public List<Film> findTopFilmsByLikesOrGenreAndYear(int genreId, int year, int count) {
+        List<Film> films;
+
+        if (genreId < 0 || genreId > 6) {
+            throw new GenreDoesNotExistException("Получен некорректный id жанра");
+        }
+        if (year < 0 || year > 0 && year < 1895) {
+            throw new GenreDoesNotExistException("Дата релиза должна быть не ранее 1895 года");
+        }
+
+        if (genreId > 0 && year == 0) {
+            films = filmRepository.findTopFilmsByLikesAndGenre(genreId, count);
+        } else if (genreId == 0 && year > 0) {
+            films = filmRepository.findTopFilmsByLikesAndYear(year, count);
+        } else if (genreId > 0) {
+            films = filmRepository.findTopFilmsByLikesAndGenreAndYear(genreId, year, count);
+        } else {
+            films = filmRepository.findTopFilmsByLikes(count);
+        }
+        filmGenreRepository.loadGenres(films);
+        filmDirectorRepository.loadDirectors(films);
+        likeRepository.loadLikes(films);
+
+        return films;
     }
 
      public List<Film> getDirectorFilmsByLikes(int directorId) {

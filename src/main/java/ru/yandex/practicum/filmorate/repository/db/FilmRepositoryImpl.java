@@ -106,6 +106,95 @@ public class FilmRepositoryImpl implements FilmRepository {
     }
 
     @Override
+    public List<Film> findTopFilmsByLikes(int count) {
+        String sqlQuery = "SELECT f.id, f.name, f.description, f.rating_mpa_id, f.duration, f.release_date, " +
+                "r.name AS rating_name, COUNT(fl.user_id) " +
+                "FROM film AS f " +
+                "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id " +
+                "LEFT JOIN film_like AS fl ON f.id = fl.film_id " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(fl.user_id) DESC " +
+                "LIMIT ?;";
+
+        FilmRepositoryImpl.FilmMapper mapper = new FilmRepositoryImpl.FilmMapper();
+        List<Film> films = jdbcTemplate.query(
+                sqlQuery,
+                mapper,
+                count
+        );
+
+        return films;
+    }
+
+    @Override
+    public List<Film> findTopFilmsByLikesAndGenre(int genreId, int count) {
+        String sqlQuery = "SELECT f.id, f.name, f.description, f.rating_mpa_id, f.duration, f.release_date, " +
+                "r.name AS rating_name, fg.genre_id, COUNT(fl.user_id) " +
+                "FROM film AS f " +
+                "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id " +
+                "JOIN film_genre AS fg ON f.id = fg.film_id " +
+                "LEFT JOIN film_like AS fl ON f.id = fl.film_id " +
+                "WHERE fg.genre_id = ? " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(fl.user_id) DESC " +
+                "LIMIT ?;";
+
+        FilmRepositoryImpl.FilmMapper mapper = new FilmRepositoryImpl.FilmMapper();
+        List<Film> films = jdbcTemplate.query(
+                sqlQuery,
+                mapper,
+                genreId, count
+        );
+
+        return films;
+    }
+
+    @Override
+    public List<Film> findTopFilmsByLikesAndYear(int year, int count) {
+        String sqlQuery = "SELECT f.id, f.name, f.description, f.rating_mpa_id, f.duration, f.release_date, " +
+                "r.name AS rating_name, COUNT(fl.user_id) " +
+                "FROM film AS f " +
+                "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id " +
+                "LEFT JOIN film_like AS fl ON f.id = fl.film_id " +
+                "WHERE EXTRACT(YEAR FROM CAST(f.release_date AS date)) = ? " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(fl.user_id) DESC " +
+                "LIMIT ?;";
+
+        FilmRepositoryImpl.FilmMapper mapper = new FilmRepositoryImpl.FilmMapper();
+        List<Film> films = jdbcTemplate.query(
+                sqlQuery,
+                mapper,
+                year, count
+        );
+
+        return films;
+    }
+
+    @Override
+    public List<Film> findTopFilmsByLikesAndGenreAndYear(int genreId, int year, int count) {
+        String sqlQuery = "SELECT f.id, f.name, f.description, f.rating_mpa_id, f.duration, f.release_date, " +
+                "r.name AS rating_name, fg.genre_id, COUNT(fl.user_id) " +
+                "FROM film AS f " +
+                "JOIN rating_mpa AS r ON f.rating_mpa_id = r.id " +
+                "JOIN film_genre AS fg ON f.id = fg.film_id " +
+                "LEFT JOIN film_like AS fl ON f.id = fl.film_id " +
+                "WHERE fg.genre_id = ? AND EXTRACT(YEAR FROM CAST(f.release_date AS date)) = ? " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(fl.user_id) DESC " +
+                "LIMIT ?;";
+
+        FilmRepositoryImpl.FilmMapper mapper = new FilmRepositoryImpl.FilmMapper();
+        List<Film> films = jdbcTemplate.query(
+                sqlQuery,
+                mapper,
+                genreId, year, count
+        );
+
+        return films;
+    }
+
+    @Override
     public void delete(Film film) {
         final int filmId = film.getId();
         String sqlQuery = "DELETE FROM film WHERE id = ?;";
