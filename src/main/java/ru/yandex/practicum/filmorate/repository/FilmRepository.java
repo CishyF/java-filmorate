@@ -13,6 +13,10 @@ public interface FilmRepository {
 
     List<Film> findAll();
 
+    default List<Film> foundCommonFilms(int userId, int friendId) {
+        return null;
+    }
+
     default List<Film> findTopFilmsByName(String searchQuery) {
         throw new RuntimeException("Not Implemented");
     }
