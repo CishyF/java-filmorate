@@ -194,7 +194,6 @@ public class FilmRepositoryImpl implements FilmRepository {
         return films;
     }
 
-    
     @Override
     public List<Film> findTopFilmsByName(String searchQuery) {
         String sqlQuery = "SELECT f.id, f.name, f.description, f.rating_mpa_id, f.duration, f.release_date, " +
