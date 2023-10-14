@@ -198,17 +198,18 @@ public class FilmService {
         return films;
     }
 
-     public List<Film> getDirectorFilmsByLikes(int directorId) {
-        return getDirectorFilms(directorId).stream()
-                .sorted(Comparator.<Film>comparingInt(film -> film.getLikedIds().size()).reversed())
-                .collect(Collectors.toList());
-     }
-
-     public List<Film> getDirectorFilmsByYear(int directorId) {
-        return getDirectorFilms(directorId).stream()
-                .sorted(Comparator.comparing(Film::getReleaseDate))
-                .collect(Collectors.toList());
-     }
+    public List<Film> getDirectorFilmsByLikesOrYear(int directorId, String sortBy) {
+        switch (sortBy.toLowerCase()) {
+            case "likes":
+                return getDirectorFilms(directorId).stream()
+                        .sorted(Comparator.<Film>comparingInt(film -> film.getLikedIds().size()).reversed())
+                        .collect(Collectors.toList());
+            default:
+                return getDirectorFilms(directorId).stream()
+                        .sorted(Comparator.comparing(Film::getReleaseDate))
+                        .collect(Collectors.toList());
+        }
+    }
 
      public List<Film> getDirectorFilms(int directorId) {
         directorRepository.findById(directorId)

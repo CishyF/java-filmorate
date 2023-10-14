@@ -20,6 +20,8 @@ import java.util.*;
 public class FilmController {
 
     private final FilmService filmService;
+    private static final String ERROR_MESSAGE_SEARCH_FILM =
+            "Допустимые значения: director, title. Либо оба значения через запятую.";
 
     @GetMapping
     public List<Film> getFilms() {
@@ -64,21 +66,14 @@ public class FilmController {
             return commonFilms;
         }
 
-        @GetMapping("/director/{directorId}")
+    @GetMapping("/director/{directorId}")
     public List<Film> getTopFilmsOfDirectorByLikesOrReleaseYear(
             @PathVariable int directorId,
             @RequestParam(value = "sortBy", defaultValue = "") @NotBlank String sortBy
     ) {
         log.info("Пришел GET-запрос /films/director/{directorId={}}?sortBy={}", directorId, sortBy);
 
-        List<Film> directorTopFilms = Collections.emptyList();
-        switch (sortBy.toLowerCase()) {
-            case "likes":
-                directorTopFilms = filmService.getDirectorFilmsByLikes(directorId);
-                break;
-            case "year":
-                directorTopFilms = filmService.getDirectorFilmsByYear(directorId);
-        }
+        List<Film> directorTopFilms = filmService.getDirectorFilmsByLikesOrYear(directorId, sortBy);
         log.info("Ответ на GET-запрос /films/director/{directorId={}}?sortBy={} с телом={}",
                 directorId, sortBy, directorTopFilms
         );
@@ -87,13 +82,8 @@ public class FilmController {
 
     @GetMapping("/search")
     public List<Film> searchFilms(
-            @RequestParam
-            @NotBlank
-            String query,
-            @RequestParam
-            @Size(min = 1, max = 2,
-                    message = "Допустимые значения: director, title. Либо оба значения через запятую.")
-            List<String> by) {
+            @RequestParam @NotBlank String query,
+            @RequestParam @Size(min = 1, max = 2, message = ERROR_MESSAGE_SEARCH_FILM) List<String> by) {
         log.info("Пришел GET-запрос /films/search?query={}&by={}", query, by);
 
         List<Film> foundFilms = filmService.searchFilms(query, by);

@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.FilmSaveException;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.EventOperation;
 import ru.yandex.practicum.filmorate.model.EventType;
@@ -22,8 +21,8 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class EventRepositoryImpl implements EventRepository {
-    private final JdbcTemplate jdbcTemplate;
 
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public Event save(Event event) {
@@ -45,9 +44,8 @@ public class EventRepositoryImpl implements EventRepository {
                 "entity_id", event.getEntityId()
         ));
         event.setId(id);
-        Event savedEvent = findById(id)
-                .orElseThrow(() -> new FilmSaveException("Произошла ошибка при сохранении события"));
-        return savedEvent;
+
+        return event;
     }
 
     @Override
@@ -100,7 +98,6 @@ public class EventRepositoryImpl implements EventRepository {
         jdbcTemplate.update(sqlQuery, filmId);
     }
 
-
     private Event update(Event event) {
         final int eventId = event.getId();
         String sqlQuery = "UPDATE event SET timestamp = ?,user_id = ?,event_type = ?,operation = ?, entity_id = ? WHERE event_id = ?";
@@ -113,9 +110,8 @@ public class EventRepositoryImpl implements EventRepository {
                 event.getEntityId(),
                 eventId
         );
-        Event updatedEvent = findById(eventId)
-                .orElseThrow(() -> new FilmSaveException("Произошла ошибка при обновлении события"));
-        return updatedEvent;
+
+        return event;
     }
 
     private static class EventMapper implements RowMapper<Event> {

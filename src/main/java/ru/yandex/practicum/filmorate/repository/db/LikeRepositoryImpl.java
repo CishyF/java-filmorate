@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.repository.EventRepository;
 import ru.yandex.practicum.filmorate.repository.LikeRepository;
 
 import java.util.Collections;
@@ -20,7 +19,6 @@ import static java.util.stream.Collectors.toMap;
 public class LikeRepositoryImpl implements LikeRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final EventRepository eventRepository;
 
     @Override
     public void saveLikes(Film film) {

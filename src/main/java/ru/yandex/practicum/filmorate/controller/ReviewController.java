@@ -7,9 +7,7 @@ import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import javax.validation.Valid;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -24,15 +22,8 @@ public class ReviewController {
             @RequestParam(required = false, defaultValue = "10") int count
     ) {
         log.info("Пришел GET-запрос /reviews с параметром id={} и параметром count={}", filmId, count);
-        List<Review> reviews;
-        if (filmId == 0) {
-            reviews = reviewService.findAll().stream().limit(count).collect(Collectors.toList());
-        } else {
-            reviews = reviewService.findReviewsByFilmId(filmId, count);
-        }
-        reviews = reviews.stream()
-                .sorted(Comparator.comparingInt(Review::getUseful).reversed())
-                .collect(Collectors.toList());
+
+        List<Review> reviews = reviewService.findReviewsByFilmId(filmId, count);
         log.info("Ответ на GET-запрос /reviews с телом={}", reviews);
         return reviews;
     }
@@ -49,8 +40,7 @@ public class ReviewController {
     @DeleteMapping("/{id}")
     public void deleteReview(@PathVariable("id") int reviewId) {
         log.info("Пришел DELETE-запрос /reviews/{id={}}", reviewId);
-        Review review = reviewService.findById(reviewId);
-        reviewService.delete(review);
+        reviewService.delete(reviewId);
         log.info("Отзыв с id={} удален", reviewId);
     }
 
@@ -71,7 +61,6 @@ public class ReviewController {
         log.info("Отзыв review={} успешно обновлен", updatedReview);
         return updatedReview;
     }
-
 
     @PutMapping("/{id}/like/{userId}")
     public Review addLikeToReview(@PathVariable("id") int reviewId, @PathVariable int userId) {

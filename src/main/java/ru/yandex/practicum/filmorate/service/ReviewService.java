@@ -9,7 +9,9 @@ import ru.yandex.practicum.filmorate.repository.ReviewRepository;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReviewService {
@@ -26,7 +28,6 @@ public class ReviewService {
         this.filmService = filmService;
         this.eventRepository = eventRepository;
     }
-
 
     public Review create(Review review) {
         userService.findById(review.getUserId());
@@ -57,14 +58,18 @@ public class ReviewService {
     }
 
     public List<Review> findReviewsByFilmId(int filmId, int count) {
-        List<Review> reviews = reviewRepository.findReviewsByFilmId(filmId, count);
-        reviewLikeRepository.loadLikes(reviews);
-        return reviews;
-    }
+        List<Review> reviews;
 
-    public List<Review> findAll() {
-        List<Review> reviews = reviewRepository.findAll();
+        if (filmId == 0) {
+            reviews = reviewRepository.findAll().stream().limit(count).collect(Collectors.toList());
+        } else {
+            reviews = reviewRepository.findReviewsByFilmId(filmId, count);
+        }
         reviewLikeRepository.loadLikes(reviews);
+        reviews = reviews.stream()
+                .sorted(Comparator.comparingInt(Review::getUseful).reversed())
+                .collect(Collectors.toList());
+
         return reviews;
     }
 
@@ -115,8 +120,8 @@ public class ReviewService {
         reviewLikeRepository.deleteLike(review, user);
     }
 
-
-    public void delete(Review review) {
+    public void delete(int reviewId) {
+        Review review = findById(reviewId);
         reviewLikeRepository.deleteLikes(review);
         reviewRepository.delete(review);
         eventRepository.save(Event.builder()
@@ -126,5 +131,4 @@ public class ReviewService {
                 .operation(EventOperation.REMOVE)
                 .entityId(review.getId()).build());
     }
-
 }

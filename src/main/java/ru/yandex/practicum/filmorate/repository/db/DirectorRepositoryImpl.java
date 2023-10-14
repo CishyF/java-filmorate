@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.DirectorSaveException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.repository.DirectorRepository;
 
@@ -41,9 +40,7 @@ public class DirectorRepositoryImpl implements DirectorRepository {
         ));
         director.setId(id);
 
-        Director savedDirector = findById(id)
-                .orElseThrow(() -> new DirectorSaveException("Произошла ошибка при сохранении режиссера"));
-        return savedDirector;
+        return director;
     }
 
     private Director update(Director director) {
@@ -55,9 +52,7 @@ public class DirectorRepositoryImpl implements DirectorRepository {
                 directorId
         );
 
-        Director updatedDirector = findById(directorId)
-                .orElseThrow(() -> new DirectorSaveException("Произошла ошибка при обновлении режиссера"));
-        return updatedDirector;
+        return director;
     }
 
     @Override
