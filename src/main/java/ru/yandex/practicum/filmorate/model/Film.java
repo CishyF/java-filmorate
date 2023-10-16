@@ -22,6 +22,8 @@ public class Film {
 
     private final Set<Genre> genres = new HashSet<>();
 
+    private final Set<Director> directors = new HashSet<>();
+
     @NotNull
     private RatingMPA mpa;
 
@@ -52,6 +54,10 @@ public class Film {
 
     public void addGenre(Genre genre) {
         genres.add(genre);
+    }
+
+    public void addDirector(Director director) {
+        directors.add(director);
     }
 
     public void removeLike(User user) {
